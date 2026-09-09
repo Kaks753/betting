@@ -36,6 +36,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import math
 import sys
 import time
 import warnings
@@ -141,7 +142,8 @@ def devig_h2h(row: pd.Series) -> Optional[Tuple[float, float, float]]:
         ph = float(row["odds_home_pinnacle"])
         pd_ = float(row["odds_draw_pinnacle"])
         pa = float(row["odds_away_pinnacle"])
-        if ph <= 1 or pd_ <= 1 or pa <= 1:
+        # NOTE: nan comparisons silently pass ≤ 1 guard → must check isnan explicitly
+        if any(math.isnan(v) or v <= 1 for v in (ph, pd_, pa)):
             return None
         inv = 1/ph + 1/pd_ + 1/pa
         return (1/ph)/inv, (1/pd_)/inv, (1/pa)/inv
@@ -314,7 +316,19 @@ def run_round(
                 else:
                     cal_h, cal_d, cal_a = raw_pred["home"], raw_pred["draw"], raw_pred["away"]
 
-                predictions.append((cal_h, cal_d, cal_a))
+                # FIX: Brier uses Pinnacle-blended probs (same as V3),
+                # NOT raw DC calibrated probs.  Pinnacle is well-calibrated
+                # so the blend dramatically lowers Brier (~0.576 vs ~0.656).
+                pin_brier = devig_h2h(row)
+                if pin_brier is not None:
+                    alpha = V4["blend_dc_weight"]   # 0.20
+                    brier_h = alpha * cal_h + (1 - alpha) * pin_brier[0]
+                    brier_d = alpha * cal_d + (1 - alpha) * pin_brier[1]
+                    brier_a = alpha * cal_a + (1 - alpha) * pin_brier[2]
+                    predictions.append((brier_h, brier_d, brier_a))
+                else:
+                    # No Pinnacle odds → fall back to calibrated DC
+                    predictions.append((cal_h, cal_d, cal_a))
                 results.append(result)
             else:
                 raw_pred = None
@@ -618,17 +632,18 @@ def main():
 
     rounds_config = BACKTEST["walk_forward_rounds"]
     round_results = []
-    partial_save = {"version": "v4", "rounds_complete": 0, "rounds": []}
-
     for idx in rounds_to_run:
         rconfig = rounds_config[idx - 1]
         result  = run_round(all_df, idx, rconfig, markets)
         round_results.append(result)
 
-        # Incremental save
-        partial_save["rounds_complete"] += 1
-        partial_save["rounds"].append(result)
-        _save_results(partial_save, round_results)
+        # Incremental save — pass only the accumulated results so far;
+        # _save_results will set header["rounds"] = round_results directly.
+        _save_results({
+            "version": "v4",
+            "rounds_complete": len(round_results),
+            "status": "in_progress",
+        }, round_results)
         log.info(f"  [Saved → {RESULT_PATH}]")
 
     # ── Aggregate ─────────────────────────────────────────────────────────

@@ -1,0 +1,195 @@
+{
+  "version": "v4",
+  "rounds_complete": 3,
+  "avg_brier": 0.5795,
+  "avg_roi": -0.0424,
+  "total_bets": 10721,
+  "roi_by_round": [
+    -0.0155,
+    -0.0924,
+    -0.0192
+  ],
+  "gate_brier": "True",
+  "gate_roi": "False",
+  "gate_bets": true,
+  "gate_overall": "False",
+  "markets": [
+    "1x2",
+    "ou",
+    "corners",
+    "cards"
+  ],
+  "gates": {
+    "brier": 0.58,
+    "roi": 0.03,
+    "bets": 500
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "train_end": "2022-06-01",
+      "test_start": "2022-08-01",
+      "test_end": "2023-06-01",
+      "n_train": 13829,
+      "n_test": 3477,
+      "brier_score": 0.582,
+      "n_value_bets": 3405,
+      "n_1x2_bets": 424,
+      "n_ou_bets": 2981,
+      "n_corners_bets": 0,
+      "n_cards_bets": 0,
+      "roi_all": -0.0155,
+      "roi_1x2": 0.0342,
+      "roi_ou": -0.0226,
+      "roi_corners": 0.0,
+      "roi_cards": 0.0,
+      "profit_units": {
+        "all": -52.88,
+        "1x2": 14.5,
+        "ou": -67.38,
+        "corners": 0.0,
+        "cards": 0.0
+      },
+      "ou_trend_coeff_fitted": 0.003,
+      "elapsed_s": 208,
+      "v4_params": {
+        "blend_dc_weight": 0.2,
+        "1x2_ev_thresh": 0.02,
+        "1x2_min_prob": 0.25,
+        "1x2_vs_pin_gap": 0.015,
+        "ou_ev_thresh": 0.05,
+        "ou_min_prob": 0.35,
+        "ou_rolling_days": 60,
+        "ou_trend_threshold": 2.75,
+        "ou_trend_coeff": 0.008,
+        "corners_ev_thresh": 0.04,
+        "corners_min_prob": 0.4,
+        "corners_lines": [
+          9.5,
+          10.5
+        ],
+        "cards_ev_thresh": 0.04,
+        "cards_min_prob": 0.4,
+        "cards_lines": [
+          3.5,
+          4.5
+        ],
+        "slippage": 0.2,
+        "min_odds": 1.35,
+        "max_odds": 5.5,
+        "calib_tail_quantile": 0.75
+      }
+    },
+    {
+      "round": 2,
+      "train_end": "2023-06-01",
+      "test_start": "2023-08-01",
+      "test_end": "2024-06-01",
+      "n_train": 17335,
+      "n_test": 3458,
+      "brier_score": 0.5725,
+      "n_value_bets": 3763,
+      "n_1x2_bets": 814,
+      "n_ou_bets": 2949,
+      "n_corners_bets": 0,
+      "n_cards_bets": 0,
+      "roi_all": -0.0924,
+      "roi_1x2": -0.1427,
+      "roi_ou": -0.0785,
+      "roi_corners": 0.0,
+      "roi_cards": 0.0,
+      "profit_units": {
+        "all": -347.58,
+        "1x2": -116.17,
+        "ou": -231.41,
+        "corners": 0.0,
+        "cards": 0.0
+      },
+      "ou_trend_coeff_fitted": 0.01913,
+      "elapsed_s": 227,
+      "v4_params": {
+        "blend_dc_weight": 0.2,
+        "1x2_ev_thresh": 0.02,
+        "1x2_min_prob": 0.25,
+        "1x2_vs_pin_gap": 0.015,
+        "ou_ev_thresh": 0.05,
+        "ou_min_prob": 0.35,
+        "ou_rolling_days": 60,
+        "ou_trend_threshold": 2.75,
+        "ou_trend_coeff": 0.008,
+        "corners_ev_thresh": 0.04,
+        "corners_min_prob": 0.4,
+        "corners_lines": [
+          9.5,
+          10.5
+        ],
+        "cards_ev_thresh": 0.04,
+        "cards_min_prob": 0.4,
+        "cards_lines": [
+          3.5,
+          4.5
+        ],
+        "slippage": 0.2,
+        "min_odds": 1.35,
+        "max_odds": 5.5,
+        "calib_tail_quantile": 0.75
+      }
+    },
+    {
+      "round": 3,
+      "train_end": "2024-06-01",
+      "test_start": "2024-08-01",
+      "test_end": "2025-06-01",
+      "n_train": 20831,
+      "n_test": 3453,
+      "brier_score": 0.5839,
+      "n_value_bets": 3553,
+      "n_1x2_bets": 642,
+      "n_ou_bets": 2911,
+      "n_corners_bets": 0,
+      "n_cards_bets": 0,
+      "roi_all": -0.0192,
+      "roi_1x2": -0.0523,
+      "roi_ou": -0.0119,
+      "roi_corners": 0.0,
+      "roi_cards": 0.0,
+      "profit_units": {
+        "all": -68.18,
+        "1x2": -33.59,
+        "ou": -34.59,
+        "corners": 0.0,
+        "cards": 0.0
+      },
+      "ou_trend_coeff_fitted": 0.01108,
+      "elapsed_s": 244,
+      "v4_params": {
+        "blend_dc_weight": 0.2,
+        "1x2_ev_thresh": 0.02,
+        "1x2_min_prob": 0.25,
+        "1x2_vs_pin_gap": 0.015,
+        "ou_ev_thresh": 0.05,
+        "ou_min_prob": 0.35,
+        "ou_rolling_days": 60,
+        "ou_trend_threshold": 2.75,
+        "ou_trend_coeff": 0.008,
+        "corners_ev_thresh": 0.04,
+        "corners_min_prob": 0.4,
+        "corners_lines": [
+          9.5,
+          10.5
+        ],
+        "cards_ev_thresh": 0.04,
+        "cards_min_prob": 0.4,
+        "cards_lines": [
+          3.5,
+          4.5
+        ],
+        "slippage": 0.2,
+        "min_odds": 1.35,
+        "max_odds": 5.5,
+        "calib_tail_quantile": 0.75
+      }
+    }
+  ],
+  "saved_at": "2026-09-09T15:16:13.844995+00:00"
+}
