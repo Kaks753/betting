@@ -246,7 +246,9 @@ async def run_cron(
     _: bool = Depends(require_admin),
 ) -> Dict:
     """
-    Manually trigger the cron runner (admin only).
+    Manually trigger the cron runner in the background (admin only).
+    Returns immediately — card generation takes 3-5 minutes.
+    Check /card/{date} or /status after ~5 minutes to see results.
     Requires X-Admin-Token header.
     """
     import subprocess
@@ -256,13 +258,24 @@ async def run_cron(
     if simulate:
         cmd.append("--simulate")
 
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+    # Launch as background process — don't wait for it (model fitting takes 3-5min)
+    log_path = Path(__file__).parent.parent / "logs" / f"cron_{date_str}.log"
+    log_path.parent.mkdir(exist_ok=True)
+    with open(log_path, "w") as logf:
+        proc = subprocess.Popen(
+            cmd,
+            stdout=logf,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+        )
+
     return {
-        "status":     "ok" if result.returncode == 0 else "error",
-        "returncode": result.returncode,
-        "date":       date_str,
-        "stdout":     result.stdout[-2000:],
-        "stderr":     result.stderr[-1000:],
+        "status":   "started",
+        "pid":      proc.pid,
+        "date":     date_str,
+        "simulate": simulate,
+        "message":  "Card generation started in background. Check /card/{date} in ~5 minutes.",
+        "log":      str(log_path),
     }
 
 
