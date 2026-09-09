@@ -1,5 +1,7 @@
 # Render.com deployment config
 # Deploy from GitHub: https://render.com → New Web Service → Connect repo
+# Note: Persistent disk requires a paid plan. Free plan uses ephemeral storage.
+# SQLite data resets on redeploy on free plan — acceptable for analytics.
 services:
   - type: web
     name: kbet-api
@@ -9,17 +11,15 @@ services:
     startCommand: uvicorn kbet.api.app:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: ODDS_API_KEY
-        sync: false        # Set this in Render dashboard
+        sync: false        # Set this in Render dashboard after getting from the-odds-api.com
       - key: ADMIN_TOKEN
-        sync: false        # Set in dashboard
+        sync: false        # Set a secret value in dashboard
       - key: BANKROLL
         value: "1000"
       - key: MAX_BETS
         value: "10"
-    disk:
-      name: kbet-data
-      mountPath: /opt/render/project/src/kbet/data
-      sizeGB: 1            # Free tier: 1GB
+      - key: PYTHONPATH
+        value: "/opt/render/project/src"
 
 cron:
   # Daily card at 10:00 UTC
