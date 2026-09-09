@@ -49,17 +49,4 @@ primary_region = "iad"   # Washington DC — change to closest: lhr=London, cdg=
 
 # Cron job — daily card at 10:00 UTC
 # Fly.io machines are used for scheduled tasks
-[[statics]]
-  # No static files needed
 
-# Health check
-[[services]]
-  protocol   = "tcp"
-  internal_port = 8080
-
-  [[services.http_checks]]
-    interval      = "10s"
-    timeout       = "5s"
-    grace_period  = "30s"
-    method        = "GET"
-    path          = "/"
