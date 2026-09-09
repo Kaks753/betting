@@ -652,10 +652,14 @@ def main():
     log.info(f"  Avg ROI (all mkts):     {avg_roi*100:+.2f}%")
     log.info(f"  Total value bets:       {total_bets:,}")
     log.info(f"  ROI by round:           {[f'{r*100:+.1f}%' for r in roi_by_round]}")
-    log.info(f"  1X2 ROI by round:       {[f'{r[\"roi_1x2\"]*100:+.1f}%' for r in round_results]}")
-    log.info(f"  O/U ROI by round:       {[f'{r[\"roi_ou\"]*100:+.1f}%' for r in round_results]}")
-    log.info(f"  Corners ROI by round:   {[f'{r[\"roi_corners\"]*100:+.1f}%' for r in round_results]}")
-    log.info(f"  Cards ROI by round:     {[f'{r[\"roi_cards\"]*100:+.1f}%' for r in round_results]}")
+    roi_1x2_str     = [f"{r['roi_1x2']*100:+.1f}%"     for r in round_results]
+    roi_ou_str      = [f"{r['roi_ou']*100:+.1f}%"      for r in round_results]
+    roi_corners_str = [f"{r['roi_corners']*100:+.1f}%" for r in round_results]
+    roi_cards_str   = [f"{r['roi_cards']*100:+.1f}%"   for r in round_results]
+    log.info(f"  1X2 ROI by round:       {roi_1x2_str}")
+    log.info(f"  O/U ROI by round:       {roi_ou_str}")
+    log.info(f"  Corners ROI by round:   {roi_corners_str}")
+    log.info(f"  Cards ROI by round:     {roi_cards_str}")
 
     log.info("\n  GATE CONDITIONS (V4):")
     log.info(f"  Brier < {GATES['brier']}:      {'✅ PASS' if gate_brier else '❌ FAIL'}  ({avg_brier:.4f})")
