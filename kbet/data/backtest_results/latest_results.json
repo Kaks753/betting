@@ -1,0 +1,150 @@
+{
+  "rounds_complete": 3,
+  "avg_brier": 0.6046999999999999,
+  "avg_roi": -0.04593333333333333,
+  "total_bets": 9706,
+  "roi_by_round": [
+    0.0003,
+    -0.0919,
+    -0.0462
+  ],
+  "consistent_positive": false,
+  "gate_brier": true,
+  "gate_roi": false,
+  "gate_bets": true,
+  "gate_overall": false,
+  "rounds": [
+    {
+      "round": 1,
+      "train_end": "2022-06-01",
+      "test_start": "2022-08-01",
+      "test_end": "2023-06-01",
+      "n_train": 13828,
+      "n_test": 3477,
+      "n_predictions": 3477,
+      "n_value_bets": 3169,
+      "brier_score": 0.5972,
+      "log_loss": 1.0009,
+      "roi_all": {
+        "roi": 0.0003,
+        "n_bets": 3169.0,
+        "n_wins": 1333.0,
+        "win_rate": 0.4206,
+        "profit_units": 0.02,
+        "total_staked": 63.38
+      },
+      "roi_1x2": {
+        "roi": -0.0262,
+        "n_bets": 1374.0,
+        "n_wins": 425.0,
+        "win_rate": 0.3093,
+        "profit_units": -0.72,
+        "total_staked": 27.48
+      },
+      "roi_ou": {
+        "roi": 0.0206,
+        "n_bets": 1795.0,
+        "n_wins": 908.0,
+        "win_rate": 0.5058,
+        "profit_units": 0.74,
+        "total_staked": 35.9
+      },
+      "clv": {
+        "clv_mean": 0.0,
+        "clv_median": 0.0,
+        "clv_positive_rate": 0.0,
+        "n_clv": 3169.0
+      },
+      "baseline_roi": -0.0175,
+      "n_teams": 242
+    },
+    {
+      "round": 2,
+      "train_end": "2023-06-01",
+      "test_start": "2023-08-01",
+      "test_end": "2024-06-01",
+      "n_train": 17334,
+      "n_test": 3458,
+      "n_predictions": 3458,
+      "n_value_bets": 3376,
+      "brier_score": 0.6035,
+      "log_loss": 1.0086,
+      "roi_all": {
+        "roi": -0.0919,
+        "n_bets": 3376.0,
+        "n_wins": 1226.0,
+        "win_rate": 0.3632,
+        "profit_units": -6.21,
+        "total_staked": 67.52
+      },
+      "roi_1x2": {
+        "roi": -0.1476,
+        "n_bets": 1534.0,
+        "n_wins": 405.0,
+        "win_rate": 0.264,
+        "profit_units": -4.53,
+        "total_staked": 30.68
+      },
+      "roi_ou": {
+        "roi": -0.0456,
+        "n_bets": 1842.0,
+        "n_wins": 821.0,
+        "win_rate": 0.4457,
+        "profit_units": -1.68,
+        "total_staked": 36.84
+      },
+      "clv": {
+        "clv_mean": 0.0,
+        "clv_median": 0.0,
+        "clv_positive_rate": 0.0,
+        "n_clv": 3376.0
+      },
+      "baseline_roi": -0.0832,
+      "n_teams": 251
+    },
+    {
+      "round": 3,
+      "train_end": "2024-06-01",
+      "test_start": "2024-08-01",
+      "test_end": "2025-06-01",
+      "n_train": 20830,
+      "n_test": 3453,
+      "n_predictions": 3453,
+      "n_value_bets": 3161,
+      "brier_score": 0.6134,
+      "log_loss": 1.0237,
+      "roi_all": {
+        "roi": -0.0462,
+        "n_bets": 3161.0,
+        "n_wins": 1233.0,
+        "win_rate": 0.3901,
+        "profit_units": -2.92,
+        "total_staked": 63.22
+      },
+      "roi_1x2": {
+        "roi": -0.0655,
+        "n_bets": 1477.0,
+        "n_wins": 418.0,
+        "win_rate": 0.283,
+        "profit_units": -1.94,
+        "total_staked": 29.54
+      },
+      "roi_ou": {
+        "roi": -0.0292,
+        "n_bets": 1684.0,
+        "n_wins": 815.0,
+        "win_rate": 0.484,
+        "profit_units": -0.98,
+        "total_staked": 33.68
+      },
+      "clv": {
+        "clv_mean": 0.0,
+        "clv_median": 0.0,
+        "clv_positive_rate": 0.0,
+        "n_clv": 3161.0
+      },
+      "baseline_roi": -0.0753,
+      "n_teams": 261
+    }
+  ]
+}

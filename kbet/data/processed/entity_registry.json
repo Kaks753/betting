@@ -1,0 +1,2644 @@
+{
+  "registry": {
+    "9949a161-f050-4ce1-96b4-22a74e45e45e": {
+      "canonical": "Manchester City",
+      "variants": [
+        "Manchester City",
+        "Man City",
+        "Manchester City FC",
+        "Man. City",
+        "MCFC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "7dd52e23-4552-4784-b743-1cbcf9337fb6": {
+      "canonical": "Manchester United",
+      "variants": [
+        "Manchester United",
+        "Man United",
+        "Man Utd",
+        "Manchester Utd",
+        "MUFC",
+        "Man. Utd"
+      ],
+      "league": null,
+      "country": null
+    },
+    "8718e65a-0425-4518-9272-e4efaf44f600": {
+      "canonical": "Arsenal",
+      "variants": [
+        "Arsenal",
+        "Arsenal FC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "76900cb5-e327-45f9-9c8b-6497aa3ebece": {
+      "canonical": "Liverpool",
+      "variants": [
+        "Liverpool",
+        "Liverpool FC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "fe8d55d1-e996-4385-971d-f0a4d4fcfbec": {
+      "canonical": "Chelsea",
+      "variants": [
+        "Chelsea",
+        "Chelsea FC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "8348725f-0a6e-482e-9f11-37ea46254e5a": {
+      "canonical": "Tottenham",
+      "variants": [
+        "Tottenham",
+        "Spurs",
+        "Tottenham Hotspur",
+        "Tottenham FC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "332f9f4c-1340-445a-b1c7-b255c269899a": {
+      "canonical": "Newcastle",
+      "variants": [
+        "Newcastle",
+        "Newcastle United",
+        "Newcastle Utd",
+        "NUFC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "db4346fa-7273-4a84-bef9-c3d6075bbf99": {
+      "canonical": "Aston Villa",
+      "variants": [
+        "Aston Villa",
+        "Aston Villa FC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "609db78e-8a33-4984-be50-07c2100441ab": {
+      "canonical": "West Ham",
+      "variants": [
+        "West Ham",
+        "West Ham United",
+        "West Ham Utd"
+      ],
+      "league": null,
+      "country": null
+    },
+    "e2a20dce-ba68-4bd8-8133-dde920d45d16": {
+      "canonical": "Everton",
+      "variants": [
+        "Everton",
+        "Everton FC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "cad22236-5cfb-49e2-adf3-6f65a6aa5b6f": {
+      "canonical": "Leicester",
+      "variants": [
+        "Leicester",
+        "Leicester City",
+        "Leicester City FC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "7e3e0afd-8f3c-4c08-a330-658d6af12a4a": {
+      "canonical": "Brighton",
+      "variants": [
+        "Brighton",
+        "Brighton & Hove Albion",
+        "Brighton and Hove Albion"
+      ],
+      "league": null,
+      "country": null
+    },
+    "0532bd39-83d2-40fd-87f6-0fe073d5e90d": {
+      "canonical": "Brentford",
+      "variants": [
+        "Brentford",
+        "Brentford FC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "901df3ef-535e-45a2-a2fb-62e7576c2253": {
+      "canonical": "Fulham",
+      "variants": [
+        "Fulham",
+        "Fulham FC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "50566451-48e2-4ed8-857f-c20ee9bf41fb": {
+      "canonical": "Wolves",
+      "variants": [
+        "Wolves",
+        "Wolverhampton",
+        "Wolverhampton Wanderers",
+        "Wolverhampton W"
+      ],
+      "league": null,
+      "country": null
+    },
+    "b2a93e03-6d43-4c6c-a7a3-7995217d610a": {
+      "canonical": "Crystal Palace",
+      "variants": [
+        "Crystal Palace",
+        "Crystal Palace FC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "899f2712-b715-4091-a60f-d15a541a66ec": {
+      "canonical": "Nottm Forest",
+      "variants": [
+        "Nottm Forest",
+        "Nottingham Forest",
+        "Nott'm Forest"
+      ],
+      "league": null,
+      "country": null
+    },
+    "072f143b-4c8e-4bd7-a5ba-a1b7192600b2": {
+      "canonical": "Burnley",
+      "variants": [
+        "Burnley",
+        "Burnley FC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "854e76fe-ef3f-47e8-87e8-5afc8226697e": {
+      "canonical": "Luton",
+      "variants": [
+        "Luton",
+        "Luton Town",
+        "Luton Town FC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "99fe13c4-fe24-4858-9de1-e0ad739deb85": {
+      "canonical": "Sheffield United",
+      "variants": [
+        "Sheffield United",
+        "Sheffield Utd",
+        "Sheff United"
+      ],
+      "league": null,
+      "country": null
+    },
+    "8fbf895f-3159-460b-89c0-42a5db0f0afe": {
+      "canonical": "Leeds",
+      "variants": [
+        "Leeds",
+        "Leeds United",
+        "Leeds United FC",
+        "Leeds Utd"
+      ],
+      "league": null,
+      "country": null
+    },
+    "c0cd83b7-7391-49f2-b6bc-9f6864b00e8d": {
+      "canonical": "Barcelona",
+      "variants": [
+        "Barcelona",
+        "FC Barcelona",
+        "Barca"
+      ],
+      "league": null,
+      "country": null
+    },
+    "5b19e9a3-9fb8-4fb0-80a7-54bea5b1d3a5": {
+      "canonical": "Real Madrid",
+      "variants": [
+        "Real Madrid",
+        "Real Madrid CF"
+      ],
+      "league": null,
+      "country": null
+    },
+    "bf48d5a7-c640-44df-946f-bcb8f6fd04a6": {
+      "canonical": "Atletico Madrid",
+      "variants": [
+        "Atletico Madrid",
+        "Atl. Madrid",
+        "Atletico de Madrid",
+        "Atl\u00e9tico Madrid",
+        "Ath Madrid"
+      ],
+      "league": null,
+      "country": null
+    },
+    "f51b4cd9-5fba-4a23-85ac-ab8cc195103c": {
+      "canonical": "Sevilla",
+      "variants": [
+        "Sevilla",
+        "Sevilla FC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "fb06f4b9-3256-4581-aedf-cc679194ee74": {
+      "canonical": "Valencia",
+      "variants": [
+        "Valencia",
+        "Valencia CF"
+      ],
+      "league": null,
+      "country": null
+    },
+    "84987953-0aad-4b5e-bf7b-8b325313297a": {
+      "canonical": "Villarreal",
+      "variants": [
+        "Villarreal",
+        "Villarreal CF"
+      ],
+      "league": null,
+      "country": null
+    },
+    "27694526-40e7-4471-acca-b5b7a60c9e83": {
+      "canonical": "Real Sociedad",
+      "variants": [
+        "Real Sociedad",
+        "Real Sociedad CF"
+      ],
+      "league": null,
+      "country": null
+    },
+    "eb61f44d-e400-4153-8f17-4f76863b9214": {
+      "canonical": "Athletic Bilbao",
+      "variants": [
+        "Athletic Bilbao",
+        "Athletic Club",
+        "Athletic Club Bilbao"
+      ],
+      "league": null,
+      "country": null
+    },
+    "e7c788ff-72dc-4b22-9d47-7a930a7057ce": {
+      "canonical": "Getafe",
+      "variants": [
+        "Getafe",
+        "Getafe CF"
+      ],
+      "league": null,
+      "country": null
+    },
+    "649fdf16-4f61-43c6-8027-89e1874a37eb": {
+      "canonical": "Bayern Munich",
+      "variants": [
+        "Bayern Munich",
+        "Bayern M\u00fcnchen",
+        "FC Bayern M\u00fcnchen",
+        "Bayern Munchen"
+      ],
+      "league": null,
+      "country": null
+    },
+    "1518987e-7527-4af6-9ea6-2fbdc86ccf35": {
+      "canonical": "Borussia Dortmund",
+      "variants": [
+        "Borussia Dortmund",
+        "Dortmund",
+        "BVB"
+      ],
+      "league": null,
+      "country": null
+    },
+    "af528086-b939-46a0-90d1-8611aa6a3aec": {
+      "canonical": "RB Leipzig",
+      "variants": [
+        "RB Leipzig",
+        "Leipzig",
+        "RasenBallsport Leipzig"
+      ],
+      "league": null,
+      "country": null
+    },
+    "f06dd111-2820-47a9-b0fc-e4efeaec73a9": {
+      "canonical": "Bayer Leverkusen",
+      "variants": [
+        "Bayer Leverkusen",
+        "Leverkusen"
+      ],
+      "league": null,
+      "country": null
+    },
+    "db193261-bd90-439c-a4b6-5ecfd0b3615e": {
+      "canonical": "Eintracht Frankfurt",
+      "variants": [
+        "Eintracht Frankfurt",
+        "Frankfurt"
+      ],
+      "league": null,
+      "country": null
+    },
+    "a1b0e0e9-1811-4c5d-a310-0d78408ba666": {
+      "canonical": "Wolfsburg",
+      "variants": [
+        "Wolfsburg",
+        "VfL Wolfsburg"
+      ],
+      "league": null,
+      "country": null
+    },
+    "2afa22d3-3af0-451f-8f05-1b91ae31c761": {
+      "canonical": "Freiburg",
+      "variants": [
+        "Freiburg",
+        "SC Freiburg"
+      ],
+      "league": null,
+      "country": null
+    },
+    "41069ab8-6706-4bf5-9312-a7afb1784256": {
+      "canonical": "Juventus",
+      "variants": [
+        "Juventus",
+        "Juve",
+        "Juventus FC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "879e7f58-93d2-41f6-b636-171b06321748": {
+      "canonical": "Inter",
+      "variants": [
+        "Inter",
+        "Inter Milan",
+        "FC Internazionale",
+        "Internazionale"
+      ],
+      "league": null,
+      "country": null
+    },
+    "33338fc8-b316-4487-b887-a86622dcd6fd": {
+      "canonical": "AC Milan",
+      "variants": [
+        "AC Milan",
+        "Milan"
+      ],
+      "league": null,
+      "country": null
+    },
+    "e40ecb79-fab5-4247-854b-02af756cf270": {
+      "canonical": "Napoli",
+      "variants": [
+        "Napoli",
+        "SSC Napoli"
+      ],
+      "league": null,
+      "country": null
+    },
+    "c56d2890-c14f-4573-add0-7e9d8dc37fd5": {
+      "canonical": "Roma",
+      "variants": [
+        "Roma",
+        "AS Roma"
+      ],
+      "league": null,
+      "country": null
+    },
+    "fd9a65ff-c77f-40a8-8ece-ab6b4b3a4c73": {
+      "canonical": "Lazio",
+      "variants": [
+        "Lazio",
+        "SS Lazio"
+      ],
+      "league": null,
+      "country": null
+    },
+    "8c63a978-315d-4b0c-92a2-16ad0e7fbfdc": {
+      "canonical": "Atalanta",
+      "variants": [
+        "Atalanta",
+        "Atalanta BC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "36fed4e0-1dbd-4127-bd40-1dbb1578cf3a": {
+      "canonical": "PSG",
+      "variants": [
+        "PSG",
+        "Paris Saint-Germain",
+        "Paris SG",
+        "Paris Saint Germain"
+      ],
+      "league": null,
+      "country": null
+    },
+    "6c07028a-c124-4258-ab06-c2c0a427e365": {
+      "canonical": "Marseille",
+      "variants": [
+        "Marseille",
+        "Olympique Marseille",
+        "OM"
+      ],
+      "league": null,
+      "country": null
+    },
+    "aa3e3768-b316-40cb-b1a2-79fc6e3ac168": {
+      "canonical": "Lyon",
+      "variants": [
+        "Lyon",
+        "Olympique Lyonnais"
+      ],
+      "league": null,
+      "country": null
+    },
+    "1e66f218-db0f-49b1-a782-df2649afb365": {
+      "canonical": "Monaco",
+      "variants": [
+        "Monaco",
+        "AS Monaco"
+      ],
+      "league": null,
+      "country": null
+    },
+    "eb0a1e9c-7c6b-407e-8c0b-6cc19786abd7": {
+      "canonical": "Lille",
+      "variants": [
+        "Lille",
+        "LOSC Lille",
+        "LOSC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "b922dafb-a9e1-4c4d-b3ca-dbf4227a66b5": {
+      "canonical": "Ajax",
+      "variants": [
+        "Ajax",
+        "Ajax Amsterdam",
+        "AFC Ajax"
+      ],
+      "league": null,
+      "country": null
+    },
+    "95c86b07-71c9-4534-b631-81cffb79b91a": {
+      "canonical": "PSV",
+      "variants": [
+        "PSV",
+        "PSV Eindhoven"
+      ],
+      "league": null,
+      "country": null
+    },
+    "b187727b-3cf7-4c2b-af92-9f2ab8ea0e73": {
+      "canonical": "Feyenoord",
+      "variants": [
+        "Feyenoord",
+        "Feyenoord Rotterdam"
+      ],
+      "league": null,
+      "country": null
+    },
+    "e023182d-1fb8-4571-8c4c-825763fee9d5": {
+      "canonical": "Benfica",
+      "variants": [
+        "Benfica",
+        "SL Benfica"
+      ],
+      "league": null,
+      "country": null
+    },
+    "0e3851d7-1aa1-4160-b0cf-824581140d17": {
+      "canonical": "Porto",
+      "variants": [
+        "Porto",
+        "FC Porto"
+      ],
+      "league": null,
+      "country": null
+    },
+    "5e99e789-2162-416e-847b-9b3c990298a5": {
+      "canonical": "Sporting",
+      "variants": [
+        "Sporting",
+        "Sporting CP",
+        "Sporting Lisbon"
+      ],
+      "league": null,
+      "country": null
+    },
+    "37b8cf59-21fc-447a-abb0-29d56aa9fa17": {
+      "canonical": "Standard",
+      "variants": [
+        "Standard"
+      ],
+      "league": null,
+      "country": null
+    },
+    "51691d1c-72b2-4238-bb83-0f115619005a": {
+      "canonical": "Kortrijk",
+      "variants": [
+        "Kortrijk"
+      ],
+      "league": null,
+      "country": null
+    },
+    "a6c703cd-ea21-4fdd-9472-180e9ae1ec32": {
+      "canonical": "Oostende",
+      "variants": [
+        "Oostende"
+      ],
+      "league": null,
+      "country": null
+    },
+    "d37ab415-210c-4c15-aecc-22640f6119f8": {
+      "canonical": "Waregem",
+      "variants": [
+        "Waregem"
+      ],
+      "league": null,
+      "country": null
+    },
+    "dd1bcf6c-041b-43cf-a944-4b2c118c6bf6": {
+      "canonical": "St Truiden",
+      "variants": [
+        "St Truiden"
+      ],
+      "league": null,
+      "country": null
+    },
+    "4e8a8519-15b7-4c27-b6e3-10c9a3afcf80": {
+      "canonical": "Lokeren",
+      "variants": [
+        "Lokeren"
+      ],
+      "league": null,
+      "country": null
+    },
+    "6f106c40-ab0f-43ee-adec-ab9a9529a77c": {
+      "canonical": "Club Brugge",
+      "variants": [
+        "Club Brugge"
+      ],
+      "league": null,
+      "country": null
+    },
+    "f92d52f5-427b-4e33-9e3d-c20e1b69d2b8": {
+      "canonical": "Charleroi",
+      "variants": [
+        "Charleroi"
+      ],
+      "league": null,
+      "country": null
+    },
+    "047f1a5b-39a9-4000-a6aa-345e072af8b3": {
+      "canonical": "Waasland-Beveren",
+      "variants": [
+        "Waasland-Beveren"
+      ],
+      "league": null,
+      "country": null
+    },
+    "e8635adb-84f9-4be8-a2ba-8f9fa05dae5d": {
+      "canonical": "Reading",
+      "variants": [
+        "Reading"
+      ],
+      "league": null,
+      "country": null
+    },
+    "452e5ebd-cff4-47d2-8625-83faade5981c": {
+      "canonical": "Antwerp",
+      "variants": [
+        "Antwerp"
+      ],
+      "league": null,
+      "country": null
+    },
+    "7cf16483-acfb-4b36-ae9c-0d0617bd08a0": {
+      "canonical": "Ipswich",
+      "variants": [
+        "Ipswich"
+      ],
+      "league": null,
+      "country": null
+    },
+    "a7867bff-9da1-47ea-b192-78f301640e9f": {
+      "canonical": "Bristol City",
+      "variants": [
+        "Bristol City"
+      ],
+      "league": null,
+      "country": null
+    },
+    "8e9e0755-4dc5-49de-9a1f-505745c8d80d": {
+      "canonical": "Birmingham",
+      "variants": [
+        "Birmingham"
+      ],
+      "league": null,
+      "country": null
+    },
+    "ff033c90-44da-4c04-85c5-b3fc02023b05": {
+      "canonical": "Wigan",
+      "variants": [
+        "Wigan"
+      ],
+      "league": null,
+      "country": null
+    },
+    "6f73b85e-3598-422e-b08e-ea4c4ae78d61": {
+      "canonical": "Cercle Brugge",
+      "variants": [
+        "Cercle Brugge"
+      ],
+      "league": null,
+      "country": null
+    },
+    "138f74e1-baec-479c-8c1c-8fad6a5d91c4": {
+      "canonical": "Gent",
+      "variants": [
+        "Gent"
+      ],
+      "league": null,
+      "country": null
+    },
+    "f8b86829-d3ba-4622-a3e0-6cb91d823206": {
+      "canonical": "Millwall",
+      "variants": [
+        "Millwall"
+      ],
+      "league": null,
+      "country": null
+    },
+    "9ef802e6-a9c7-47a5-85cb-3a33581d5471": {
+      "canonical": "Eupen",
+      "variants": [
+        "Eupen"
+      ],
+      "league": null,
+      "country": null
+    },
+    "ff325e18-1560-4943-a9e2-4138569dbb9f": {
+      "canonical": "West Brom",
+      "variants": [
+        "West Brom"
+      ],
+      "league": null,
+      "country": null
+    },
+    "87013a35-e3f7-48d8-9ce4-e8374a8c6a62": {
+      "canonical": "Preston",
+      "variants": [
+        "Preston"
+      ],
+      "league": null,
+      "country": null
+    },
+    "b51bc9f8-515f-45fc-8187-e95c1201c8fe": {
+      "canonical": "Mouscron",
+      "variants": [
+        "Mouscron"
+      ],
+      "league": null,
+      "country": null
+    },
+    "10fe52a9-9cab-4ade-b5bd-df979f3f4361": {
+      "canonical": "Genk",
+      "variants": [
+        "Genk"
+      ],
+      "league": null,
+      "country": null
+    },
+    "c96b5ba1-7908-4afa-a47a-e2e2da2a3e86": {
+      "canonical": "Anderlecht",
+      "variants": [
+        "Anderlecht"
+      ],
+      "league": null,
+      "country": null
+    },
+    "d0c73a1f-b12d-4e05-bd0a-c004ca456d8d": {
+      "canonical": "Hull",
+      "variants": [
+        "Hull"
+      ],
+      "league": null,
+      "country": null
+    },
+    "4db84c93-5a0c-4e59-8fb3-f64198c0900e": {
+      "canonical": "Middlesbrough",
+      "variants": [
+        "Middlesbrough"
+      ],
+      "league": null,
+      "country": null
+    },
+    "64f90442-bad3-4b65-bbb2-4a81dd8740ab": {
+      "canonical": "Zwolle",
+      "variants": [
+        "Zwolle"
+      ],
+      "league": null,
+      "country": null
+    },
+    "53766f15-4d85-4b3b-b870-dabee69353c8": {
+      "canonical": "QPR",
+      "variants": [
+        "QPR"
+      ],
+      "league": null,
+      "country": null
+    },
+    "2b8aee9e-0c58-4b07-bcdb-65e2038c5da3": {
+      "canonical": "Norwich",
+      "variants": [
+        "Norwich"
+      ],
+      "league": null,
+      "country": null
+    },
+    "fd2038ec-6fff-4dc6-88bd-eb566ea09d03": {
+      "canonical": "Excelsior",
+      "variants": [
+        "Excelsior"
+      ],
+      "league": null,
+      "country": null
+    },
+    "74504443-3f9e-41af-bff7-ee6987e7b5ab": {
+      "canonical": "Willem II",
+      "variants": [
+        "Willem II"
+      ],
+      "league": null,
+      "country": null
+    },
+    "032921d2-a893-4838-a1e3-3d3f8d89d1cb": {
+      "canonical": "Rotherham",
+      "variants": [
+        "Rotherham"
+      ],
+      "league": null,
+      "country": null
+    },
+    "cd661f54-b658-4475-be3d-e0f73b36c79b": {
+      "canonical": "Swansea",
+      "variants": [
+        "Swansea"
+      ],
+      "league": null,
+      "country": null
+    },
+    "ca80bb68-db42-4dc5-bbfe-7acdf0bd105e": {
+      "canonical": "Derby",
+      "variants": [
+        "Derby"
+      ],
+      "league": null,
+      "country": null
+    },
+    "3955081f-f6c0-430d-b5a8-7a1e5e397283": {
+      "canonical": "Setubal",
+      "variants": [
+        "Setubal"
+      ],
+      "league": null,
+      "country": null
+    },
+    "866db7a6-4b07-4e2e-ae64-5e23915c1f93": {
+      "canonical": "Bolton",
+      "variants": [
+        "Bolton"
+      ],
+      "league": null,
+      "country": null
+    },
+    "5e30f45c-5acb-46a3-adc7-0a7dcd61dc88": {
+      "canonical": "Blackburn",
+      "variants": [
+        "Blackburn"
+      ],
+      "league": null,
+      "country": null
+    },
+    "f41d6da5-3863-4c63-9d0b-9d499a33c82f": {
+      "canonical": "Tondela",
+      "variants": [
+        "Tondela"
+      ],
+      "league": null,
+      "country": null
+    },
+    "10d16e65-f338-4f42-8953-43babac7afc0": {
+      "canonical": "Stoke",
+      "variants": [
+        "Stoke"
+      ],
+      "league": null,
+      "country": null
+    },
+    "c41e8720-1d23-4b83-aea0-78afa908412d": {
+      "canonical": "Sheffield Weds",
+      "variants": [
+        "Sheffield Weds"
+      ],
+      "league": null,
+      "country": null
+    },
+    "21770409-2e7a-4d97-b82a-0ec6b4871adf": {
+      "canonical": "Bournemouth",
+      "variants": [
+        "Bournemouth"
+      ],
+      "league": null,
+      "country": null
+    },
+    "dcd6f5f5-f4b1-428e-bca1-f8e2880ded27": {
+      "canonical": "Huddersfield",
+      "variants": [
+        "Huddersfield"
+      ],
+      "league": null,
+      "country": null
+    },
+    "5da24c4d-8b3a-4735-8bb4-0046ce13ee2a": {
+      "canonical": "Watford",
+      "variants": [
+        "Watford"
+      ],
+      "league": null,
+      "country": null
+    },
+    "4563ae2e-2886-4bf9-81b5-cc61831f5d58": {
+      "canonical": "Angers",
+      "variants": [
+        "Angers"
+      ],
+      "league": null,
+      "country": null
+    },
+    "749a7054-c980-4263-a38d-fa9d9c0bb2b6": {
+      "canonical": "Nice",
+      "variants": [
+        "Nice"
+      ],
+      "league": null,
+      "country": null
+    },
+    "2e4940dd-6327-41ee-a458-28e10bfa6fe2": {
+      "canonical": "St Etienne",
+      "variants": [
+        "St Etienne"
+      ],
+      "league": null,
+      "country": null
+    },
+    "62a9f31c-012b-4ea5-ba40-62fe47f8f6aa": {
+      "canonical": "Montpellier",
+      "variants": [
+        "Montpellier"
+      ],
+      "league": null,
+      "country": null
+    },
+    "5b94c5ab-065c-45ec-854e-3da6aceadda1": {
+      "canonical": "Nantes",
+      "variants": [
+        "Nantes"
+      ],
+      "league": null,
+      "country": null
+    },
+    "3d2b527f-bc70-46f8-9093-7446b7810ec2": {
+      "canonical": "Feirense",
+      "variants": [
+        "Feirense"
+      ],
+      "league": null,
+      "country": null
+    },
+    "11500d5f-9f8a-4492-96be-a15c6b5bc66b": {
+      "canonical": "Southampton",
+      "variants": [
+        "Southampton"
+      ],
+      "league": null,
+      "country": null
+    },
+    "bae73106-b0d1-452e-8afe-140f9ed159ea": {
+      "canonical": "Maritimo",
+      "variants": [
+        "Maritimo"
+      ],
+      "league": null,
+      "country": null
+    },
+    "0552d38e-ea99-43b1-bca4-9c53115040e7": {
+      "canonical": "Sp Braga",
+      "variants": [
+        "Sp Braga"
+      ],
+      "league": null,
+      "country": null
+    },
+    "5d3e43bb-d62a-4a18-a293-2ec691ecdf8e": {
+      "canonical": "AZ Alkmaar",
+      "variants": [
+        "AZ Alkmaar"
+      ],
+      "league": null,
+      "country": null
+    },
+    "bfe291e2-16a7-4b56-bd87-70ee83a5cd43": {
+      "canonical": "Vitesse",
+      "variants": [
+        "Vitesse"
+      ],
+      "league": null,
+      "country": null
+    },
+    "3827febb-0e17-42e8-9460-38d11f324229": {
+      "canonical": "Graafschap",
+      "variants": [
+        "Graafschap"
+      ],
+      "league": null,
+      "country": null
+    },
+    "80264b26-e029-4f65-98e6-32a45624c2c6": {
+      "canonical": "Den Haag",
+      "variants": [
+        "Den Haag"
+      ],
+      "league": null,
+      "country": null
+    },
+    "74dfee6d-10f0-4682-b27a-f30dede5ba03": {
+      "canonical": "Moreirense",
+      "variants": [
+        "Moreirense"
+      ],
+      "league": null,
+      "country": null
+    },
+    "64216afd-555c-4f60-990c-705816236921": {
+      "canonical": "Bordeaux",
+      "variants": [
+        "Bordeaux"
+      ],
+      "league": null,
+      "country": null
+    },
+    "169259ac-825b-4c3b-8c48-1f0df1d060be": {
+      "canonical": "Portimonense",
+      "variants": [
+        "Portimonense"
+      ],
+      "league": null,
+      "country": null
+    },
+    "f4a730ce-5f17-4b5e-8685-8a72a2807ae8": {
+      "canonical": "Betis",
+      "variants": [
+        "Betis"
+      ],
+      "league": null,
+      "country": null
+    },
+    "a5c011ec-c65b-4c05-bfb9-237c25c1573e": {
+      "canonical": "Reims",
+      "variants": [
+        "Reims"
+      ],
+      "league": null,
+      "country": null
+    },
+    "f5796299-2aed-44ad-ba0a-d8d527693589": {
+      "canonical": "Groningen",
+      "variants": [
+        "Groningen"
+      ],
+      "league": null,
+      "country": null
+    },
+    "695ce5ea-e414-4625-ae21-e3ede9cf7d75": {
+      "canonical": "Aves",
+      "variants": [
+        "Aves",
+        "AVS"
+      ],
+      "league": null,
+      "country": null
+    },
+    "053f8ee9-71af-47bc-b97b-f686af8d9107": {
+      "canonical": "Girona",
+      "variants": [
+        "Girona"
+      ],
+      "league": null,
+      "country": null
+    },
+    "2c26021e-34d2-4e98-8e99-f85c57ab3381": {
+      "canonical": "Celta",
+      "variants": [
+        "Celta"
+      ],
+      "league": null,
+      "country": null
+    },
+    "89afc637-e56a-4d47-b898-e27ad430941f": {
+      "canonical": "Boavista",
+      "variants": [
+        "Boavista"
+      ],
+      "league": null,
+      "country": null
+    },
+    "0c4e83ab-1148-41ab-a7e8-f206a9a69ad5": {
+      "canonical": "Sp Lisbon",
+      "variants": [
+        "Sp Lisbon"
+      ],
+      "league": null,
+      "country": null
+    },
+    "9d4aac2b-57a3-444a-ab75-9f7ef685f9c9": {
+      "canonical": "Cardiff",
+      "variants": [
+        "Cardiff"
+      ],
+      "league": null,
+      "country": null
+    },
+    "5a5b4130-4108-4bc4-b188-15207f81926b": {
+      "canonical": "Chaves",
+      "variants": [
+        "Chaves"
+      ],
+      "league": null,
+      "country": null
+    },
+    "dfd9927f-1d6c-4c0f-8c4c-b8b17ec0d471": {
+      "canonical": "NAC Breda",
+      "variants": [
+        "NAC Breda"
+      ],
+      "league": null,
+      "country": null
+    },
+    "78093b38-fe45-4a09-af57-ab2c68466003": {
+      "canonical": "For Sittard",
+      "variants": [
+        "For Sittard"
+      ],
+      "league": null,
+      "country": null
+    },
+    "f3925e25-8dde-48ac-bbe7-1c531b4b6966": {
+      "canonical": "VVV Venlo",
+      "variants": [
+        "VVV Venlo"
+      ],
+      "league": null,
+      "country": null
+    },
+    "6fa80ec9-d6ed-42e6-a029-6fe3fa01e755": {
+      "canonical": "Rennes",
+      "variants": [
+        "Rennes"
+      ],
+      "league": null,
+      "country": null
+    },
+    "0d8e83b0-e82a-40fe-8195-6f507380964d": {
+      "canonical": "Heracles",
+      "variants": [
+        "Heracles"
+      ],
+      "league": null,
+      "country": null
+    },
+    "335122e0-b164-4d3a-ad8f-4a662b2a8fb6": {
+      "canonical": "Guingamp",
+      "variants": [
+        "Guingamp"
+      ],
+      "league": null,
+      "country": null
+    },
+    "4b15949a-4b2c-44ee-aaa8-8994e455ce60": {
+      "canonical": "Dijon",
+      "variants": [
+        "Dijon"
+      ],
+      "league": null,
+      "country": null
+    },
+    "2763580a-fab8-45af-b2f5-41fbf292754f": {
+      "canonical": "Caen",
+      "variants": [
+        "Caen"
+      ],
+      "league": null,
+      "country": null
+    },
+    "1b16bf2f-1ed8-462a-953c-ee8e70d2ce30": {
+      "canonical": "Amiens",
+      "variants": [
+        "Amiens"
+      ],
+      "league": null,
+      "country": null
+    },
+    "986b3b7a-1494-4d6b-865b-0f5e366b09fc": {
+      "canonical": "Chievo",
+      "variants": [
+        "Chievo"
+      ],
+      "league": null,
+      "country": null
+    },
+    "34ee42d3-a671-4f82-83ac-850433d8d6e7": {
+      "canonical": "Strasbourg",
+      "variants": [
+        "Strasbourg"
+      ],
+      "league": null,
+      "country": null
+    },
+    "ac07e177-aa42-4586-9e9c-baa75f353a9e": {
+      "canonical": "Nimes",
+      "variants": [
+        "Nimes"
+      ],
+      "league": null,
+      "country": null
+    },
+    "36e6023c-1625-407a-9677-e55d50c5fe42": {
+      "canonical": "Santa Clara",
+      "variants": [
+        "Santa Clara"
+      ],
+      "league": null,
+      "country": null
+    },
+    "e8797998-6529-487e-8021-c4d7375c6a12": {
+      "canonical": "Rio Ave",
+      "variants": [
+        "Rio Ave"
+      ],
+      "league": null,
+      "country": null
+    },
+    "ef0344e2-b3e3-42d8-9152-4e75ee8b553c": {
+      "canonical": "Nacional",
+      "variants": [
+        "Nacional"
+      ],
+      "league": null,
+      "country": null
+    },
+    "e435d012-faeb-45d0-a835-0fb44b98563e": {
+      "canonical": "Sassuolo",
+      "variants": [
+        "Sassuolo"
+      ],
+      "league": null,
+      "country": null
+    },
+    "3fcd5fdb-0f7b-4a72-aacc-3dbe5233347e": {
+      "canonical": "Torino",
+      "variants": [
+        "Torino"
+      ],
+      "league": null,
+      "country": null
+    },
+    "13da2014-6aa8-4b7a-82dc-b60fd7f98b5e": {
+      "canonical": "Parma",
+      "variants": [
+        "Parma"
+      ],
+      "league": null,
+      "country": null
+    },
+    "284a0c63-cc49-4514-98c4-86e308bdbdbe": {
+      "canonical": "Toulouse",
+      "variants": [
+        "Toulouse"
+      ],
+      "league": null,
+      "country": null
+    },
+    "8d0f11d2-d5b3-4997-a372-e3a7fca7533b": {
+      "canonical": "FC Emmen",
+      "variants": [
+        "FC Emmen"
+      ],
+      "league": null,
+      "country": null
+    },
+    "53314a4f-19d7-44f0-ba5f-aa5d2eb40689": {
+      "canonical": "Bologna",
+      "variants": [
+        "Bologna"
+      ],
+      "league": null,
+      "country": null
+    },
+    "d30eb26d-bd7f-4b0f-b481-7fa143e959bd": {
+      "canonical": "Eibar",
+      "variants": [
+        "Eibar"
+      ],
+      "league": null,
+      "country": null
+    },
+    "edcd324b-5f74-4bf8-aa09-ede4a9591ff8": {
+      "canonical": "Vallecano",
+      "variants": [
+        "Vallecano"
+      ],
+      "league": null,
+      "country": null
+    },
+    "13ed486b-1843-4ba0-a118-d284e11c852e": {
+      "canonical": "Belenenses",
+      "variants": [
+        "Belenenses"
+      ],
+      "league": null,
+      "country": null
+    },
+    "aef522a6-0c17-47fc-a00a-b60ce376683c": {
+      "canonical": "Utrecht",
+      "variants": [
+        "Utrecht"
+      ],
+      "league": null,
+      "country": null
+    },
+    "c12959a9-71ef-456f-8bda-b967c24db120": {
+      "canonical": "Heerenveen",
+      "variants": [
+        "Heerenveen"
+      ],
+      "league": null,
+      "country": null
+    },
+    "5247f7f4-915c-4a89-8ad6-ffaf50f44a60": {
+      "canonical": "Empoli",
+      "variants": [
+        "Empoli"
+      ],
+      "league": null,
+      "country": null
+    },
+    "5daee8ab-e338-4e74-b0b9-65a27c91b7f0": {
+      "canonical": "Ath Bilbao",
+      "variants": [
+        "Ath Bilbao"
+      ],
+      "league": null,
+      "country": null
+    },
+    "7fc7900e-3fbc-45e2-b9d8-32e0189720da": {
+      "canonical": "Guimaraes",
+      "variants": [
+        "Guimaraes"
+      ],
+      "league": null,
+      "country": null
+    },
+    "a290e2eb-5568-41e1-98b2-5de3b9899c72": {
+      "canonical": "Leganes",
+      "variants": [
+        "Leganes"
+      ],
+      "league": null,
+      "country": null
+    },
+    "85c7c4c0-484b-4582-a6a7-29a2a7e6a46e": {
+      "canonical": "Werder Bremen",
+      "variants": [
+        "Werder Bremen"
+      ],
+      "league": null,
+      "country": null
+    },
+    "3f01e789-f7fb-4352-9aab-51958fc51583": {
+      "canonical": "Hertha",
+      "variants": [
+        "Hertha"
+      ],
+      "league": null,
+      "country": null
+    },
+    "d7a4855b-b46b-4204-a168-1187fe31c3a8": {
+      "canonical": "M'gladbach",
+      "variants": [
+        "M'gladbach"
+      ],
+      "league": null,
+      "country": null
+    },
+    "5039de25-2453-44f5-90f9-6804f2705e80": {
+      "canonical": "AEK",
+      "variants": [
+        "AEK"
+      ],
+      "league": null,
+      "country": null
+    },
+    "77685709-1203-4cde-bbd4-90dec1596d4f": {
+      "canonical": "Alaves",
+      "variants": [
+        "Alaves"
+      ],
+      "league": null,
+      "country": null
+    },
+    "623eec1c-e533-474b-8bea-b0d2c84cb7ce": {
+      "canonical": "Valladolid",
+      "variants": [
+        "Valladolid"
+      ],
+      "league": null,
+      "country": null
+    },
+    "891a2b87-bc65-4e5a-b76e-73fca495981c": {
+      "canonical": "PAOK",
+      "variants": [
+        "PAOK"
+      ],
+      "league": null,
+      "country": null
+    },
+    "bdb080de-0a98-4f30-b970-37a07e6af932": {
+      "canonical": "Panetolikos",
+      "variants": [
+        "Panetolikos"
+      ],
+      "league": null,
+      "country": null
+    },
+    "cf9eadd8-7f11-49d9-ad8d-348e4df8caa6": {
+      "canonical": "Apollon",
+      "variants": [
+        "Apollon"
+      ],
+      "league": null,
+      "country": null
+    },
+    "99a5059f-7dca-466a-8c45-2a72d3168c46": {
+      "canonical": "Fortuna Dusseldorf",
+      "variants": [
+        "Fortuna Dusseldorf"
+      ],
+      "league": null,
+      "country": null
+    },
+    "77e946e4-69c3-4aae-8e0f-6d59765d047b": {
+      "canonical": "Frosinone",
+      "variants": [
+        "Frosinone"
+      ],
+      "league": null,
+      "country": null
+    },
+    "3b4bd00b-84c5-4f75-9fd3-e590cf02c145": {
+      "canonical": "Genoa",
+      "variants": [
+        "Genoa"
+      ],
+      "league": null,
+      "country": null
+    },
+    "5d7d3819-974f-45ca-9bce-7d52f87be3b5": {
+      "canonical": "Fiorentina",
+      "variants": [
+        "Fiorentina"
+      ],
+      "league": null,
+      "country": null
+    },
+    "7d62bb03-8bb5-4316-96b4-d67a46e4da83": {
+      "canonical": "Udinese",
+      "variants": [
+        "Udinese"
+      ],
+      "league": null,
+      "country": null
+    },
+    "c8487b41-8a1b-44da-ac79-68471dfe874d": {
+      "canonical": "Xanthi",
+      "variants": [
+        "Xanthi"
+      ],
+      "league": null,
+      "country": null
+    },
+    "de750d63-fd3f-4907-82b5-caf273be11e2": {
+      "canonical": "Spal",
+      "variants": [
+        "Spal"
+      ],
+      "league": null,
+      "country": null
+    },
+    "9a0855ee-0982-480b-a20d-9e2a7003e84d": {
+      "canonical": "Cagliari",
+      "variants": [
+        "Cagliari"
+      ],
+      "league": null,
+      "country": null
+    },
+    "9c6ea5ab-95e6-4736-8919-3a21e6c2484a": {
+      "canonical": "Espanol",
+      "variants": [
+        "Espanol"
+      ],
+      "league": null,
+      "country": null
+    },
+    "191fad24-461c-45f6-8130-81745d543c49": {
+      "canonical": "Panionios",
+      "variants": [
+        "Panionios"
+      ],
+      "league": null,
+      "country": null
+    },
+    "6f1e1f8a-9927-45aa-b37d-1ddb4ae19b36": {
+      "canonical": "Olympiakos",
+      "variants": [
+        "Olympiakos"
+      ],
+      "league": null,
+      "country": null
+    },
+    "d562df72-2727-40cb-9082-b8f247bc979e": {
+      "canonical": "Mainz",
+      "variants": [
+        "Mainz"
+      ],
+      "league": null,
+      "country": null
+    },
+    "393609d7-a1a8-458d-8aea-f7f8fc151c47": {
+      "canonical": "Lamia",
+      "variants": [
+        "Lamia"
+      ],
+      "league": null,
+      "country": null
+    },
+    "0d294d83-b065-4b9d-80d7-0e30526e8d91": {
+      "canonical": "Levante",
+      "variants": [
+        "Levante"
+      ],
+      "league": null,
+      "country": null
+    },
+    "c878bd62-909e-4227-8cf9-20439a7e7c98": {
+      "canonical": "Hannover",
+      "variants": [
+        "Hannover"
+      ],
+      "league": null,
+      "country": null
+    },
+    "9792730c-e03f-4eb7-8104-65b1ff693b04": {
+      "canonical": "Nurnberg",
+      "variants": [
+        "Nurnberg"
+      ],
+      "league": null,
+      "country": null
+    },
+    "1ba83178-befe-408e-af53-db5b05e1acba": {
+      "canonical": "Asteras Tripolis",
+      "variants": [
+        "Asteras Tripolis"
+      ],
+      "league": null,
+      "country": null
+    },
+    "fecdde25-2c9a-4072-a20b-e4473c434f69": {
+      "canonical": "Hoffenheim",
+      "variants": [
+        "Hoffenheim"
+      ],
+      "league": null,
+      "country": null
+    },
+    "02f14607-8863-40ae-9084-fb29289d3fef": {
+      "canonical": "Ein Frankfurt",
+      "variants": [
+        "Ein Frankfurt"
+      ],
+      "league": null,
+      "country": null
+    },
+    "8cb12015-3e0f-4eba-b180-1cd05a79b905": {
+      "canonical": "Augsburg",
+      "variants": [
+        "Augsburg"
+      ],
+      "league": null,
+      "country": null
+    },
+    "0a786a98-9976-4672-971c-5e45498636b5": {
+      "canonical": "Atromitos",
+      "variants": [
+        "Atromitos"
+      ],
+      "league": null,
+      "country": null
+    },
+    "526c9615-fd11-4ef8-aea3-951798dc3861": {
+      "canonical": "Panathinaikos",
+      "variants": [
+        "Panathinaikos"
+      ],
+      "league": null,
+      "country": null
+    },
+    "3e568881-a209-4814-9fdd-18abbec998c9": {
+      "canonical": "Stuttgart",
+      "variants": [
+        "Stuttgart"
+      ],
+      "league": null,
+      "country": null
+    },
+    "1ac5127c-367e-443f-9a99-dd7bdbebd938": {
+      "canonical": "Schalke 04",
+      "variants": [
+        "Schalke 04"
+      ],
+      "league": null,
+      "country": null
+    },
+    "dee4bad7-c08e-4e19-a9db-6a81d32b071e": {
+      "canonical": "Aris",
+      "variants": [
+        "Aris"
+      ],
+      "league": null,
+      "country": null
+    },
+    "7549e246-5106-4a9d-be19-a5d35f8377fb": {
+      "canonical": "Sampdoria",
+      "variants": [
+        "Sampdoria"
+      ],
+      "league": null,
+      "country": null
+    },
+    "c2fd510d-9c8c-4127-ae7d-737bca712d36": {
+      "canonical": "Levadeiakos",
+      "variants": [
+        "Levadeiakos"
+      ],
+      "league": null,
+      "country": null
+    },
+    "2033aba0-7ede-4988-8724-c7547954c6c6": {
+      "canonical": "Huesca",
+      "variants": [
+        "Huesca"
+      ],
+      "league": null,
+      "country": null
+    },
+    "5fe14474-2b15-4945-bfc3-c68c1b783705": {
+      "canonical": "OFI Crete",
+      "variants": [
+        "OFI Crete"
+      ],
+      "league": null,
+      "country": null
+    },
+    "c986fe8d-9eb7-4fd2-bad5-2e1c78269070": {
+      "canonical": "Sociedad",
+      "variants": [
+        "Sociedad"
+      ],
+      "league": null,
+      "country": null
+    },
+    "6212d9f8-ade1-471c-ae59-7f0cac6ef020": {
+      "canonical": "Larisa",
+      "variants": [
+        "Larisa"
+      ],
+      "league": null,
+      "country": null
+    },
+    "ae4e2f9b-cadc-473f-a4b5-6380d8f0c5ec": {
+      "canonical": "Giannina",
+      "variants": [
+        "Giannina"
+      ],
+      "league": null,
+      "country": null
+    },
+    "15eb9e53-b2d2-4f3c-84e8-026c9326e170": {
+      "canonical": "Twente",
+      "variants": [
+        "Twente"
+      ],
+      "league": null,
+      "country": null
+    },
+    "052c5991-fa25-4629-9758-98e3f2bda8ee": {
+      "canonical": "Mechelen",
+      "variants": [
+        "Mechelen"
+      ],
+      "league": null,
+      "country": null
+    },
+    "cf9d08a8-d3a9-464e-81c0-baa91c28aedd": {
+      "canonical": "Barnsley",
+      "variants": [
+        "Barnsley"
+      ],
+      "league": null,
+      "country": null
+    },
+    "0ab12b1c-b72f-4104-b038-b3c34b93acea": {
+      "canonical": "Sparta Rotterdam",
+      "variants": [
+        "Sparta Rotterdam"
+      ],
+      "league": null,
+      "country": null
+    },
+    "74471980-d698-4480-937c-f7913b527beb": {
+      "canonical": "Brest",
+      "variants": [
+        "Brest"
+      ],
+      "league": null,
+      "country": null
+    },
+    "cad83171-db5d-4a6d-bde4-b137200a5227": {
+      "canonical": "Gil Vicente",
+      "variants": [
+        "Gil Vicente"
+      ],
+      "league": null,
+      "country": null
+    },
+    "b10c3922-3d69-45ba-aad2-c2c0cb8657c3": {
+      "canonical": "Charlton",
+      "variants": [
+        "Charlton"
+      ],
+      "league": null,
+      "country": null
+    },
+    "2bf95216-f0f0-4ae2-a0d4-1cd4be32e3a3": {
+      "canonical": "Waalwijk",
+      "variants": [
+        "Waalwijk"
+      ],
+      "league": null,
+      "country": null
+    },
+    "f5b3d4e7-1ca9-4c5d-909f-e76282178157": {
+      "canonical": "Famalicao",
+      "variants": [
+        "Famalicao"
+      ],
+      "league": null,
+      "country": null
+    },
+    "330af598-77b4-46bc-b83e-1912fa8e8125": {
+      "canonical": "Mallorca",
+      "variants": [
+        "Mallorca"
+      ],
+      "league": null,
+      "country": null
+    },
+    "44135c14-c4e2-44e2-8435-667b4a3fb8cb": {
+      "canonical": "Metz",
+      "variants": [
+        "Metz"
+      ],
+      "league": null,
+      "country": null
+    },
+    "c233789a-5a25-49be-bf01-6e3abed4e48e": {
+      "canonical": "Union Berlin",
+      "variants": [
+        "Union Berlin"
+      ],
+      "league": null,
+      "country": null
+    },
+    "eb0a7938-8be8-48d2-9cf3-9a65f0c0c10c": {
+      "canonical": "Pacos Ferreira",
+      "variants": [
+        "Pacos Ferreira"
+      ],
+      "league": null,
+      "country": null
+    },
+    "55d26ba0-07eb-4296-9a15-c0ce81828bac": {
+      "canonical": "FC Koln",
+      "variants": [
+        "FC Koln"
+      ],
+      "league": null,
+      "country": null
+    },
+    "92aa61da-78ae-43cf-80ad-0c58944968fa": {
+      "canonical": "Granada",
+      "variants": [
+        "Granada"
+      ],
+      "league": null,
+      "country": null
+    },
+    "e39763bd-526a-42c0-b3c7-f070814a51fd": {
+      "canonical": "Osasuna",
+      "variants": [
+        "Osasuna"
+      ],
+      "league": null,
+      "country": null
+    },
+    "03f27ba3-077b-4b8c-a949-cd465bcffdfd": {
+      "canonical": "Paderborn",
+      "variants": [
+        "Paderborn"
+      ],
+      "league": null,
+      "country": null
+    },
+    "7945ffa2-d0c3-43be-966d-5dc2688dadc9": {
+      "canonical": "Verona",
+      "variants": [
+        "Verona"
+      ],
+      "league": null,
+      "country": null
+    },
+    "4c40ad5e-ed3e-4430-9c1f-1c41eaf4fda0": {
+      "canonical": "Volos NFC",
+      "variants": [
+        "Volos NFC"
+      ],
+      "league": null,
+      "country": null
+    },
+    "9fef9eb8-ea91-4b6b-9ef8-92b40b9d4b92": {
+      "canonical": "Lecce",
+      "variants": [
+        "Lecce"
+      ],
+      "league": null,
+      "country": null
+    },
+    "42ddc5e2-7459-4f9c-8dc7-8a446b1b2e99": {
+      "canonical": "Brescia",
+      "variants": [
+        "Brescia"
+      ],
+      "league": null,
+      "country": null
+    },
+    "f181df29-7e45-4815-84d6-5b71e1bbe69d": {
+      "canonical": "Oud-Heverlee Leuven",
+      "variants": [
+        "Oud-Heverlee Leuven"
+      ],
+      "league": null,
+      "country": null
+    },
+    "039be493-205e-451e-b3dc-b487f79af7c9": {
+      "canonical": "Beerschot VA",
+      "variants": [
+        "Beerschot VA"
+      ],
+      "league": null,
+      "country": null
+    },
+    "acd71801-dbec-42ba-894b-17c8bd75b850": {
+      "canonical": "Lorient",
+      "variants": [
+        "Lorient"
+      ],
+      "league": null,
+      "country": null
+    },
+    "dde9985c-c04f-478f-9f17-2eb7366c4e38": {
+      "canonical": "Lens",
+      "variants": [
+        "Lens"
+      ],
+      "league": null,
+      "country": null
+    },
+    "f5d85910-18dc-48d4-b236-960aade1de8d": {
+      "canonical": "Cadiz",
+      "variants": [
+        "Cadiz"
+      ],
+      "league": null,
+      "country": null
+    },
+    "fee943d6-9da1-4afa-821d-1ac337bd58b2": {
+      "canonical": "Wycombe",
+      "variants": [
+        "Wycombe"
+      ],
+      "league": null,
+      "country": null
+    },
+    "90b1c00f-cf38-458c-adbb-6ba4fef1730b": {
+      "canonical": "Coventry",
+      "variants": [
+        "Coventry"
+      ],
+      "league": null,
+      "country": null
+    },
+    "5ad8f3ac-3682-4662-81bc-45b43325dd15": {
+      "canonical": "Bielefeld",
+      "variants": [
+        "Bielefeld"
+      ],
+      "league": null,
+      "country": null
+    },
+    "9a54fa22-7ba9-4ef8-908a-267f2bda2a73": {
+      "canonical": "Elche",
+      "variants": [
+        "Elche"
+      ],
+      "league": null,
+      "country": null
+    },
+    "de6d2c8e-3101-492e-8c09-9adbb94d2707": {
+      "canonical": "Crotone",
+      "variants": [
+        "Crotone"
+      ],
+      "league": null,
+      "country": null
+    },
+    "0091017a-d939-42b4-a0bc-8ce7f549b888": {
+      "canonical": "Spezia",
+      "variants": [
+        "Spezia"
+      ],
+      "league": null,
+      "country": null
+    },
+    "d4e9934b-beff-42bb-b14e-4dc863f497a4": {
+      "canonical": "Farense",
+      "variants": [
+        "Farense"
+      ],
+      "league": null,
+      "country": null
+    },
+    "27a3120d-482d-4cf5-99f1-62cf8fb82977": {
+      "canonical": "Benevento",
+      "variants": [
+        "Benevento"
+      ],
+      "league": null,
+      "country": null
+    },
+    "4375f386-e7d9-44e0-a497-f99ff497c423": {
+      "canonical": "Seraing",
+      "variants": [
+        "Seraing"
+      ],
+      "league": null,
+      "country": null
+    },
+    "29abfce9-3592-4283-90b7-2fc004594b47": {
+      "canonical": "St. Gilloise",
+      "variants": [
+        "St. Gilloise"
+      ],
+      "league": null,
+      "country": null
+    },
+    "dcb4f97f-0a2b-485a-8863-d9128b237a19": {
+      "canonical": "Arouca",
+      "variants": [
+        "Arouca"
+      ],
+      "league": null,
+      "country": null
+    },
+    "d7daddd1-d7c5-4a02-a986-c5b92ff4e687": {
+      "canonical": "Troyes",
+      "variants": [
+        "Troyes"
+      ],
+      "league": null,
+      "country": null
+    },
+    "c802a6e6-c044-490e-9fc9-bb1122b9ea5e": {
+      "canonical": "Go Ahead Eagles",
+      "variants": [
+        "Go Ahead Eagles"
+      ],
+      "league": null,
+      "country": null
+    },
+    "9cb76579-6558-40f8-a13e-73ed37d00a60": {
+      "canonical": "Estoril",
+      "variants": [
+        "Estoril"
+      ],
+      "league": null,
+      "country": null
+    },
+    "e3805437-2eaf-46e0-865a-fe1b5fe4a774": {
+      "canonical": "Vizela",
+      "variants": [
+        "Vizela"
+      ],
+      "league": null,
+      "country": null
+    },
+    "e742af22-ef2c-4689-b18f-ae94e0ac205c": {
+      "canonical": "Peterboro",
+      "variants": [
+        "Peterboro"
+      ],
+      "league": null,
+      "country": null
+    },
+    "98a3a3e4-7d40-48ac-970e-9f4ec651724a": {
+      "canonical": "Blackpool",
+      "variants": [
+        "Blackpool"
+      ],
+      "league": null,
+      "country": null
+    },
+    "b507a320-8fd1-4dd9-8577-9359ddf71fb3": {
+      "canonical": "Clermont",
+      "variants": [
+        "Clermont"
+      ],
+      "league": null,
+      "country": null
+    },
+    "1c11d369-befa-467f-99be-cc4629435a97": {
+      "canonical": "Cambuur",
+      "variants": [
+        "Cambuur"
+      ],
+      "league": null,
+      "country": null
+    },
+    "20cabcfb-3a3a-49af-b910-b58ea89acea6": {
+      "canonical": "Nijmegen",
+      "variants": [
+        "Nijmegen"
+      ],
+      "league": null,
+      "country": null
+    },
+    "df55f8ff-d204-4c9e-95d0-f25713178bb0": {
+      "canonical": "Greuther Furth",
+      "variants": [
+        "Greuther Furth"
+      ],
+      "league": null,
+      "country": null
+    },
+    "1cbf66ac-c126-427c-9453-ba4056a53e4b": {
+      "canonical": "Bochum",
+      "variants": [
+        "Bochum"
+      ],
+      "league": null,
+      "country": null
+    },
+    "275b5d43-3ef3-4807-abde-688d9f63b2fc": {
+      "canonical": "Salernitana",
+      "variants": [
+        "Salernitana"
+      ],
+      "league": null,
+      "country": null
+    },
+    "e38b76eb-a415-479e-9737-8334aab5b3f7": {
+      "canonical": "Ionikos",
+      "variants": [
+        "Ionikos"
+      ],
+      "league": null,
+      "country": null
+    },
+    "918f26f9-13c6-48a2-afc5-6055de402997": {
+      "canonical": "Venezia",
+      "variants": [
+        "Venezia"
+      ],
+      "league": null,
+      "country": null
+    },
+    "bde71164-5c9e-41db-ae4c-c91d975498c9": {
+      "canonical": "Westerlo",
+      "variants": [
+        "Westerlo"
+      ],
+      "league": null,
+      "country": null
+    },
+    "a48f1ccf-4a1d-49fa-9f30-49975f5567b1": {
+      "canonical": "Sunderland",
+      "variants": [
+        "Sunderland"
+      ],
+      "league": null,
+      "country": null
+    },
+    "fec219b7-b593-4d6e-80b6-f108e32f94d4": {
+      "canonical": "Casa Pia",
+      "variants": [
+        "Casa Pia"
+      ],
+      "league": null,
+      "country": null
+    },
+    "8835fa6d-dfd3-40fc-ab54-781aec35be3e": {
+      "canonical": "Monza",
+      "variants": [
+        "Monza"
+      ],
+      "league": null,
+      "country": null
+    },
+    "caeea24a-47d0-41a5-a4a2-443ce1f44edf": {
+      "canonical": "Volendam",
+      "variants": [
+        "Volendam"
+      ],
+      "league": null,
+      "country": null
+    },
+    "dbde2f97-dd29-4441-b738-0328c9d5bd85": {
+      "canonical": "Almeria",
+      "variants": [
+        "Almeria"
+      ],
+      "league": null,
+      "country": null
+    },
+    "c9d717b2-b422-4d02-a40a-7e9c1725065c": {
+      "canonical": "Ajaccio",
+      "variants": [
+        "Ajaccio"
+      ],
+      "league": null,
+      "country": null
+    },
+    "bab85f1d-a77d-4bf8-8000-aeb4cf9e8413": {
+      "canonical": "Auxerre",
+      "variants": [
+        "Auxerre"
+      ],
+      "league": null,
+      "country": null
+    },
+    "22ed40bd-63ce-41d9-a4eb-f0044b2f1fe8": {
+      "canonical": "Cremonese",
+      "variants": [
+        "Cremonese"
+      ],
+      "league": null,
+      "country": null
+    },
+    "ba905f59-58dd-416c-b6bf-28a57fe2da1a": {
+      "canonical": "RWD Molenbeek",
+      "variants": [
+        "RWD Molenbeek"
+      ],
+      "league": null,
+      "country": null
+    },
+    "75bb05a3-37cd-4076-bd9a-ff75a9cee580": {
+      "canonical": "Plymouth",
+      "variants": [
+        "Plymouth"
+      ],
+      "league": null,
+      "country": null
+    },
+    "da40d12c-eb21-4e62-94d2-66f2eea54d41": {
+      "canonical": "Las Palmas",
+      "variants": [
+        "Las Palmas"
+      ],
+      "league": null,
+      "country": null
+    },
+    "fe537a76-c53f-48e9-a8ad-a8eb05471f4a": {
+      "canonical": "Almere City",
+      "variants": [
+        "Almere City"
+      ],
+      "league": null,
+      "country": null
+    },
+    "a6b7abbe-898a-45b8-9345-06ac11ced11a": {
+      "canonical": "Estrela",
+      "variants": [
+        "Estrela"
+      ],
+      "league": null,
+      "country": null
+    },
+    "c5a67496-d784-48dd-a6ca-d8d873f9801e": {
+      "canonical": "Le Havre",
+      "variants": [
+        "Le Havre"
+      ],
+      "league": null,
+      "country": null
+    },
+    "1df32ebf-88e9-43ec-a203-7fce18debf16": {
+      "canonical": "Heidenheim",
+      "variants": [
+        "Heidenheim"
+      ],
+      "league": null,
+      "country": null
+    },
+    "a3c55da6-fb2a-4ae9-89fd-24287b387378": {
+      "canonical": "Darmstadt",
+      "variants": [
+        "Darmstadt"
+      ],
+      "league": null,
+      "country": null
+    },
+    "c73d3e2f-656f-418d-bf6c-226c18b6daef": {
+      "canonical": "Kifisia",
+      "variants": [
+        "Kifisia"
+      ],
+      "league": null,
+      "country": null
+    },
+    "7a0796d7-2170-4dc8-8761-f90266e8613f": {
+      "canonical": "Panserraikos",
+      "variants": [
+        "Panserraikos"
+      ],
+      "league": null,
+      "country": null
+    },
+    "31f34994-fa85-4f9d-8ce7-b4aace255942": {
+      "canonical": "Dender",
+      "variants": [
+        "Dender"
+      ],
+      "league": null,
+      "country": null
+    },
+    "43280eb7-012f-42c9-98b0-7e02ea2f50e1": {
+      "canonical": "Oxford",
+      "variants": [
+        "Oxford"
+      ],
+      "league": null,
+      "country": null
+    },
+    "adafea52-4c6e-4570-9b18-ce0d23420ed5": {
+      "canonical": "Portsmouth",
+      "variants": [
+        "Portsmouth"
+      ],
+      "league": null,
+      "country": null
+    },
+    "a991ddbe-2a33-4b9a-9afa-c630e049c4bc": {
+      "canonical": "St Pauli",
+      "variants": [
+        "St Pauli"
+      ],
+      "league": null,
+      "country": null
+    },
+    "0c281978-4232-4542-9b1d-cd86f548e40e": {
+      "canonical": "Holstein Kiel",
+      "variants": [
+        "Holstein Kiel"
+      ],
+      "league": null,
+      "country": null
+    },
+    "593a906f-3dc1-440d-9665-67d954060c37": {
+      "canonical": "Athens Kallithea",
+      "variants": [
+        "Athens Kallithea"
+      ],
+      "league": null,
+      "country": null
+    },
+    "d6b47b8b-9a7c-43b5-9e8d-b9edb89fa743": {
+      "canonical": "Como",
+      "variants": [
+        "Como"
+      ],
+      "league": null,
+      "country": null
+    }
+  },
+  "name_to_uuid": {
+    "manchester city": "9949a161-f050-4ce1-96b4-22a74e45e45e",
+    "man city": "9949a161-f050-4ce1-96b4-22a74e45e45e",
+    "manchester city fc": "9949a161-f050-4ce1-96b4-22a74e45e45e",
+    "man. city": "9949a161-f050-4ce1-96b4-22a74e45e45e",
+    "mcfc": "9949a161-f050-4ce1-96b4-22a74e45e45e",
+    "manchester united": "7dd52e23-4552-4784-b743-1cbcf9337fb6",
+    "man united": "7dd52e23-4552-4784-b743-1cbcf9337fb6",
+    "man utd": "7dd52e23-4552-4784-b743-1cbcf9337fb6",
+    "manchester utd": "7dd52e23-4552-4784-b743-1cbcf9337fb6",
+    "mufc": "7dd52e23-4552-4784-b743-1cbcf9337fb6",
+    "man. utd": "7dd52e23-4552-4784-b743-1cbcf9337fb6",
+    "arsenal": "8718e65a-0425-4518-9272-e4efaf44f600",
+    "arsenal fc": "8718e65a-0425-4518-9272-e4efaf44f600",
+    "liverpool": "76900cb5-e327-45f9-9c8b-6497aa3ebece",
+    "liverpool fc": "76900cb5-e327-45f9-9c8b-6497aa3ebece",
+    "chelsea": "fe8d55d1-e996-4385-971d-f0a4d4fcfbec",
+    "chelsea fc": "fe8d55d1-e996-4385-971d-f0a4d4fcfbec",
+    "tottenham": "8348725f-0a6e-482e-9f11-37ea46254e5a",
+    "spurs": "8348725f-0a6e-482e-9f11-37ea46254e5a",
+    "tottenham hotspur": "8348725f-0a6e-482e-9f11-37ea46254e5a",
+    "tottenham fc": "8348725f-0a6e-482e-9f11-37ea46254e5a",
+    "newcastle": "332f9f4c-1340-445a-b1c7-b255c269899a",
+    "newcastle united": "332f9f4c-1340-445a-b1c7-b255c269899a",
+    "newcastle utd": "332f9f4c-1340-445a-b1c7-b255c269899a",
+    "nufc": "332f9f4c-1340-445a-b1c7-b255c269899a",
+    "aston villa": "db4346fa-7273-4a84-bef9-c3d6075bbf99",
+    "aston villa fc": "db4346fa-7273-4a84-bef9-c3d6075bbf99",
+    "west ham": "609db78e-8a33-4984-be50-07c2100441ab",
+    "west ham united": "609db78e-8a33-4984-be50-07c2100441ab",
+    "west ham utd": "609db78e-8a33-4984-be50-07c2100441ab",
+    "everton": "e2a20dce-ba68-4bd8-8133-dde920d45d16",
+    "everton fc": "e2a20dce-ba68-4bd8-8133-dde920d45d16",
+    "leicester": "cad22236-5cfb-49e2-adf3-6f65a6aa5b6f",
+    "leicester city": "cad22236-5cfb-49e2-adf3-6f65a6aa5b6f",
+    "leicester city fc": "cad22236-5cfb-49e2-adf3-6f65a6aa5b6f",
+    "brighton": "7e3e0afd-8f3c-4c08-a330-658d6af12a4a",
+    "brighton & hove albion": "7e3e0afd-8f3c-4c08-a330-658d6af12a4a",
+    "brighton and hove albion": "7e3e0afd-8f3c-4c08-a330-658d6af12a4a",
+    "brentford": "0532bd39-83d2-40fd-87f6-0fe073d5e90d",
+    "brentford fc": "0532bd39-83d2-40fd-87f6-0fe073d5e90d",
+    "fulham": "901df3ef-535e-45a2-a2fb-62e7576c2253",
+    "fulham fc": "901df3ef-535e-45a2-a2fb-62e7576c2253",
+    "wolves": "50566451-48e2-4ed8-857f-c20ee9bf41fb",
+    "wolverhampton": "50566451-48e2-4ed8-857f-c20ee9bf41fb",
+    "wolverhampton wanderers": "50566451-48e2-4ed8-857f-c20ee9bf41fb",
+    "wolverhampton w": "50566451-48e2-4ed8-857f-c20ee9bf41fb",
+    "crystal palace": "b2a93e03-6d43-4c6c-a7a3-7995217d610a",
+    "crystal palace fc": "b2a93e03-6d43-4c6c-a7a3-7995217d610a",
+    "nottm forest": "899f2712-b715-4091-a60f-d15a541a66ec",
+    "nottingham forest": "899f2712-b715-4091-a60f-d15a541a66ec",
+    "nott'm forest": "899f2712-b715-4091-a60f-d15a541a66ec",
+    "burnley": "072f143b-4c8e-4bd7-a5ba-a1b7192600b2",
+    "burnley fc": "072f143b-4c8e-4bd7-a5ba-a1b7192600b2",
+    "luton": "854e76fe-ef3f-47e8-87e8-5afc8226697e",
+    "luton town": "854e76fe-ef3f-47e8-87e8-5afc8226697e",
+    "luton town fc": "854e76fe-ef3f-47e8-87e8-5afc8226697e",
+    "sheffield united": "99fe13c4-fe24-4858-9de1-e0ad739deb85",
+    "sheffield utd": "99fe13c4-fe24-4858-9de1-e0ad739deb85",
+    "sheff united": "99fe13c4-fe24-4858-9de1-e0ad739deb85",
+    "leeds": "8fbf895f-3159-460b-89c0-42a5db0f0afe",
+    "leeds united": "8fbf895f-3159-460b-89c0-42a5db0f0afe",
+    "leeds united fc": "8fbf895f-3159-460b-89c0-42a5db0f0afe",
+    "leeds utd": "8fbf895f-3159-460b-89c0-42a5db0f0afe",
+    "barcelona": "c0cd83b7-7391-49f2-b6bc-9f6864b00e8d",
+    "fc barcelona": "c0cd83b7-7391-49f2-b6bc-9f6864b00e8d",
+    "barca": "c0cd83b7-7391-49f2-b6bc-9f6864b00e8d",
+    "real madrid": "5b19e9a3-9fb8-4fb0-80a7-54bea5b1d3a5",
+    "real madrid cf": "5b19e9a3-9fb8-4fb0-80a7-54bea5b1d3a5",
+    "atletico madrid": "bf48d5a7-c640-44df-946f-bcb8f6fd04a6",
+    "atl. madrid": "bf48d5a7-c640-44df-946f-bcb8f6fd04a6",
+    "atletico de madrid": "bf48d5a7-c640-44df-946f-bcb8f6fd04a6",
+    "atl\u00e9tico madrid": "bf48d5a7-c640-44df-946f-bcb8f6fd04a6",
+    "sevilla": "f51b4cd9-5fba-4a23-85ac-ab8cc195103c",
+    "sevilla fc": "f51b4cd9-5fba-4a23-85ac-ab8cc195103c",
+    "valencia": "fb06f4b9-3256-4581-aedf-cc679194ee74",
+    "valencia cf": "fb06f4b9-3256-4581-aedf-cc679194ee74",
+    "villarreal": "84987953-0aad-4b5e-bf7b-8b325313297a",
+    "villarreal cf": "84987953-0aad-4b5e-bf7b-8b325313297a",
+    "real sociedad": "27694526-40e7-4471-acca-b5b7a60c9e83",
+    "real sociedad cf": "27694526-40e7-4471-acca-b5b7a60c9e83",
+    "athletic bilbao": "eb61f44d-e400-4153-8f17-4f76863b9214",
+    "athletic club": "eb61f44d-e400-4153-8f17-4f76863b9214",
+    "athletic club bilbao": "eb61f44d-e400-4153-8f17-4f76863b9214",
+    "getafe": "e7c788ff-72dc-4b22-9d47-7a930a7057ce",
+    "getafe cf": "e7c788ff-72dc-4b22-9d47-7a930a7057ce",
+    "bayern munich": "649fdf16-4f61-43c6-8027-89e1874a37eb",
+    "bayern m\u00fcnchen": "649fdf16-4f61-43c6-8027-89e1874a37eb",
+    "fc bayern m\u00fcnchen": "649fdf16-4f61-43c6-8027-89e1874a37eb",
+    "bayern munchen": "649fdf16-4f61-43c6-8027-89e1874a37eb",
+    "borussia dortmund": "1518987e-7527-4af6-9ea6-2fbdc86ccf35",
+    "dortmund": "1518987e-7527-4af6-9ea6-2fbdc86ccf35",
+    "bvb": "1518987e-7527-4af6-9ea6-2fbdc86ccf35",
+    "rb leipzig": "af528086-b939-46a0-90d1-8611aa6a3aec",
+    "leipzig": "af528086-b939-46a0-90d1-8611aa6a3aec",
+    "rasenballsport leipzig": "af528086-b939-46a0-90d1-8611aa6a3aec",
+    "bayer leverkusen": "f06dd111-2820-47a9-b0fc-e4efeaec73a9",
+    "leverkusen": "f06dd111-2820-47a9-b0fc-e4efeaec73a9",
+    "eintracht frankfurt": "db193261-bd90-439c-a4b6-5ecfd0b3615e",
+    "frankfurt": "db193261-bd90-439c-a4b6-5ecfd0b3615e",
+    "wolfsburg": "a1b0e0e9-1811-4c5d-a310-0d78408ba666",
+    "vfl wolfsburg": "a1b0e0e9-1811-4c5d-a310-0d78408ba666",
+    "freiburg": "2afa22d3-3af0-451f-8f05-1b91ae31c761",
+    "sc freiburg": "2afa22d3-3af0-451f-8f05-1b91ae31c761",
+    "juventus": "41069ab8-6706-4bf5-9312-a7afb1784256",
+    "juve": "41069ab8-6706-4bf5-9312-a7afb1784256",
+    "juventus fc": "41069ab8-6706-4bf5-9312-a7afb1784256",
+    "inter": "879e7f58-93d2-41f6-b636-171b06321748",
+    "inter milan": "879e7f58-93d2-41f6-b636-171b06321748",
+    "fc internazionale": "879e7f58-93d2-41f6-b636-171b06321748",
+    "internazionale": "879e7f58-93d2-41f6-b636-171b06321748",
+    "ac milan": "33338fc8-b316-4487-b887-a86622dcd6fd",
+    "milan": "33338fc8-b316-4487-b887-a86622dcd6fd",
+    "napoli": "e40ecb79-fab5-4247-854b-02af756cf270",
+    "ssc napoli": "e40ecb79-fab5-4247-854b-02af756cf270",
+    "roma": "c56d2890-c14f-4573-add0-7e9d8dc37fd5",
+    "as roma": "c56d2890-c14f-4573-add0-7e9d8dc37fd5",
+    "lazio": "fd9a65ff-c77f-40a8-8ece-ab6b4b3a4c73",
+    "ss lazio": "fd9a65ff-c77f-40a8-8ece-ab6b4b3a4c73",
+    "atalanta": "8c63a978-315d-4b0c-92a2-16ad0e7fbfdc",
+    "atalanta bc": "8c63a978-315d-4b0c-92a2-16ad0e7fbfdc",
+    "psg": "36fed4e0-1dbd-4127-bd40-1dbb1578cf3a",
+    "paris saint-germain": "36fed4e0-1dbd-4127-bd40-1dbb1578cf3a",
+    "paris sg": "36fed4e0-1dbd-4127-bd40-1dbb1578cf3a",
+    "paris saint germain": "36fed4e0-1dbd-4127-bd40-1dbb1578cf3a",
+    "marseille": "6c07028a-c124-4258-ab06-c2c0a427e365",
+    "olympique marseille": "6c07028a-c124-4258-ab06-c2c0a427e365",
+    "om": "6c07028a-c124-4258-ab06-c2c0a427e365",
+    "lyon": "aa3e3768-b316-40cb-b1a2-79fc6e3ac168",
+    "olympique lyonnais": "aa3e3768-b316-40cb-b1a2-79fc6e3ac168",
+    "monaco": "1e66f218-db0f-49b1-a782-df2649afb365",
+    "as monaco": "1e66f218-db0f-49b1-a782-df2649afb365",
+    "lille": "eb0a1e9c-7c6b-407e-8c0b-6cc19786abd7",
+    "losc lille": "eb0a1e9c-7c6b-407e-8c0b-6cc19786abd7",
+    "losc": "eb0a1e9c-7c6b-407e-8c0b-6cc19786abd7",
+    "ajax": "b922dafb-a9e1-4c4d-b3ca-dbf4227a66b5",
+    "ajax amsterdam": "b922dafb-a9e1-4c4d-b3ca-dbf4227a66b5",
+    "afc ajax": "b922dafb-a9e1-4c4d-b3ca-dbf4227a66b5",
+    "psv": "95c86b07-71c9-4534-b631-81cffb79b91a",
+    "psv eindhoven": "95c86b07-71c9-4534-b631-81cffb79b91a",
+    "feyenoord": "b187727b-3cf7-4c2b-af92-9f2ab8ea0e73",
+    "feyenoord rotterdam": "b187727b-3cf7-4c2b-af92-9f2ab8ea0e73",
+    "benfica": "e023182d-1fb8-4571-8c4c-825763fee9d5",
+    "sl benfica": "e023182d-1fb8-4571-8c4c-825763fee9d5",
+    "porto": "0e3851d7-1aa1-4160-b0cf-824581140d17",
+    "fc porto": "0e3851d7-1aa1-4160-b0cf-824581140d17",
+    "sporting": "5e99e789-2162-416e-847b-9b3c990298a5",
+    "sporting cp": "5e99e789-2162-416e-847b-9b3c990298a5",
+    "sporting lisbon": "5e99e789-2162-416e-847b-9b3c990298a5",
+    "standard": "37b8cf59-21fc-447a-abb0-29d56aa9fa17",
+    "kortrijk": "51691d1c-72b2-4238-bb83-0f115619005a",
+    "oostende": "a6c703cd-ea21-4fdd-9472-180e9ae1ec32",
+    "waregem": "d37ab415-210c-4c15-aecc-22640f6119f8",
+    "st truiden": "dd1bcf6c-041b-43cf-a944-4b2c118c6bf6",
+    "lokeren": "4e8a8519-15b7-4c27-b6e3-10c9a3afcf80",
+    "club brugge": "6f106c40-ab0f-43ee-adec-ab9a9529a77c",
+    "charleroi": "f92d52f5-427b-4e33-9e3d-c20e1b69d2b8",
+    "waasland-beveren": "047f1a5b-39a9-4000-a6aa-345e072af8b3",
+    "reading": "e8635adb-84f9-4be8-a2ba-8f9fa05dae5d",
+    "antwerp": "452e5ebd-cff4-47d2-8625-83faade5981c",
+    "ipswich": "7cf16483-acfb-4b36-ae9c-0d0617bd08a0",
+    "bristol city": "a7867bff-9da1-47ea-b192-78f301640e9f",
+    "birmingham": "8e9e0755-4dc5-49de-9a1f-505745c8d80d",
+    "wigan": "ff033c90-44da-4c04-85c5-b3fc02023b05",
+    "cercle brugge": "6f73b85e-3598-422e-b08e-ea4c4ae78d61",
+    "gent": "138f74e1-baec-479c-8c1c-8fad6a5d91c4",
+    "millwall": "f8b86829-d3ba-4622-a3e0-6cb91d823206",
+    "eupen": "9ef802e6-a9c7-47a5-85cb-3a33581d5471",
+    "west brom": "ff325e18-1560-4943-a9e2-4138569dbb9f",
+    "preston": "87013a35-e3f7-48d8-9ce4-e8374a8c6a62",
+    "mouscron": "b51bc9f8-515f-45fc-8187-e95c1201c8fe",
+    "genk": "10fe52a9-9cab-4ade-b5bd-df979f3f4361",
+    "anderlecht": "c96b5ba1-7908-4afa-a47a-e2e2da2a3e86",
+    "hull": "d0c73a1f-b12d-4e05-bd0a-c004ca456d8d",
+    "middlesbrough": "4db84c93-5a0c-4e59-8fb3-f64198c0900e",
+    "zwolle": "64f90442-bad3-4b65-bbb2-4a81dd8740ab",
+    "qpr": "53766f15-4d85-4b3b-b870-dabee69353c8",
+    "norwich": "2b8aee9e-0c58-4b07-bcdb-65e2038c5da3",
+    "excelsior": "fd2038ec-6fff-4dc6-88bd-eb566ea09d03",
+    "willem ii": "74504443-3f9e-41af-bff7-ee6987e7b5ab",
+    "rotherham": "032921d2-a893-4838-a1e3-3d3f8d89d1cb",
+    "swansea": "cd661f54-b658-4475-be3d-e0f73b36c79b",
+    "derby": "ca80bb68-db42-4dc5-bbfe-7acdf0bd105e",
+    "setubal": "3955081f-f6c0-430d-b5a8-7a1e5e397283",
+    "bolton": "866db7a6-4b07-4e2e-ae64-5e23915c1f93",
+    "blackburn": "5e30f45c-5acb-46a3-adc7-0a7dcd61dc88",
+    "tondela": "f41d6da5-3863-4c63-9d0b-9d499a33c82f",
+    "stoke": "10d16e65-f338-4f42-8953-43babac7afc0",
+    "sheffield weds": "c41e8720-1d23-4b83-aea0-78afa908412d",
+    "bournemouth": "21770409-2e7a-4d97-b82a-0ec6b4871adf",
+    "huddersfield": "dcd6f5f5-f4b1-428e-bca1-f8e2880ded27",
+    "watford": "5da24c4d-8b3a-4735-8bb4-0046ce13ee2a",
+    "angers": "4563ae2e-2886-4bf9-81b5-cc61831f5d58",
+    "nice": "749a7054-c980-4263-a38d-fa9d9c0bb2b6",
+    "st etienne": "2e4940dd-6327-41ee-a458-28e10bfa6fe2",
+    "montpellier": "62a9f31c-012b-4ea5-ba40-62fe47f8f6aa",
+    "nantes": "5b94c5ab-065c-45ec-854e-3da6aceadda1",
+    "feirense": "3d2b527f-bc70-46f8-9093-7446b7810ec2",
+    "southampton": "11500d5f-9f8a-4492-96be-a15c6b5bc66b",
+    "maritimo": "bae73106-b0d1-452e-8afe-140f9ed159ea",
+    "sp braga": "0552d38e-ea99-43b1-bca4-9c53115040e7",
+    "az alkmaar": "5d3e43bb-d62a-4a18-a293-2ec691ecdf8e",
+    "vitesse": "bfe291e2-16a7-4b56-bd87-70ee83a5cd43",
+    "graafschap": "3827febb-0e17-42e8-9460-38d11f324229",
+    "den haag": "80264b26-e029-4f65-98e6-32a45624c2c6",
+    "moreirense": "74dfee6d-10f0-4682-b27a-f30dede5ba03",
+    "bordeaux": "64216afd-555c-4f60-990c-705816236921",
+    "portimonense": "169259ac-825b-4c3b-8c48-1f0df1d060be",
+    "betis": "f4a730ce-5f17-4b5e-8685-8a72a2807ae8",
+    "reims": "a5c011ec-c65b-4c05-bfb9-237c25c1573e",
+    "groningen": "f5796299-2aed-44ad-ba0a-d8d527693589",
+    "aves": "695ce5ea-e414-4625-ae21-e3ede9cf7d75",
+    "girona": "053f8ee9-71af-47bc-b97b-f686af8d9107",
+    "celta": "2c26021e-34d2-4e98-8e99-f85c57ab3381",
+    "boavista": "89afc637-e56a-4d47-b898-e27ad430941f",
+    "sp lisbon": "0c4e83ab-1148-41ab-a7e8-f206a9a69ad5",
+    "cardiff": "9d4aac2b-57a3-444a-ab75-9f7ef685f9c9",
+    "chaves": "5a5b4130-4108-4bc4-b188-15207f81926b",
+    "nac breda": "dfd9927f-1d6c-4c0f-8c4c-b8b17ec0d471",
+    "for sittard": "78093b38-fe45-4a09-af57-ab2c68466003",
+    "vvv venlo": "f3925e25-8dde-48ac-bbe7-1c531b4b6966",
+    "rennes": "6fa80ec9-d6ed-42e6-a029-6fe3fa01e755",
+    "heracles": "0d8e83b0-e82a-40fe-8195-6f507380964d",
+    "guingamp": "335122e0-b164-4d3a-ad8f-4a662b2a8fb6",
+    "dijon": "4b15949a-4b2c-44ee-aaa8-8994e455ce60",
+    "caen": "2763580a-fab8-45af-b2f5-41fbf292754f",
+    "amiens": "1b16bf2f-1ed8-462a-953c-ee8e70d2ce30",
+    "chievo": "986b3b7a-1494-4d6b-865b-0f5e366b09fc",
+    "strasbourg": "34ee42d3-a671-4f82-83ac-850433d8d6e7",
+    "nimes": "ac07e177-aa42-4586-9e9c-baa75f353a9e",
+    "santa clara": "36e6023c-1625-407a-9677-e55d50c5fe42",
+    "rio ave": "e8797998-6529-487e-8021-c4d7375c6a12",
+    "nacional": "ef0344e2-b3e3-42d8-9152-4e75ee8b553c",
+    "sassuolo": "e435d012-faeb-45d0-a835-0fb44b98563e",
+    "torino": "3fcd5fdb-0f7b-4a72-aacc-3dbe5233347e",
+    "parma": "13da2014-6aa8-4b7a-82dc-b60fd7f98b5e",
+    "toulouse": "284a0c63-cc49-4514-98c4-86e308bdbdbe",
+    "fc emmen": "8d0f11d2-d5b3-4997-a372-e3a7fca7533b",
+    "bologna": "53314a4f-19d7-44f0-ba5f-aa5d2eb40689",
+    "eibar": "d30eb26d-bd7f-4b0f-b481-7fa143e959bd",
+    "vallecano": "edcd324b-5f74-4bf8-aa09-ede4a9591ff8",
+    "belenenses": "13ed486b-1843-4ba0-a118-d284e11c852e",
+    "utrecht": "aef522a6-0c17-47fc-a00a-b60ce376683c",
+    "heerenveen": "c12959a9-71ef-456f-8bda-b967c24db120",
+    "empoli": "5247f7f4-915c-4a89-8ad6-ffaf50f44a60",
+    "ath bilbao": "5daee8ab-e338-4e74-b0b9-65a27c91b7f0",
+    "guimaraes": "7fc7900e-3fbc-45e2-b9d8-32e0189720da",
+    "leganes": "a290e2eb-5568-41e1-98b2-5de3b9899c72",
+    "werder bremen": "85c7c4c0-484b-4582-a6a7-29a2a7e6a46e",
+    "hertha": "3f01e789-f7fb-4352-9aab-51958fc51583",
+    "m'gladbach": "d7a4855b-b46b-4204-a168-1187fe31c3a8",
+    "aek": "5039de25-2453-44f5-90f9-6804f2705e80",
+    "alaves": "77685709-1203-4cde-bbd4-90dec1596d4f",
+    "valladolid": "623eec1c-e533-474b-8bea-b0d2c84cb7ce",
+    "paok": "891a2b87-bc65-4e5a-b76e-73fca495981c",
+    "panetolikos": "bdb080de-0a98-4f30-b970-37a07e6af932",
+    "apollon": "cf9eadd8-7f11-49d9-ad8d-348e4df8caa6",
+    "ath madrid": "bf48d5a7-c640-44df-946f-bcb8f6fd04a6",
+    "fortuna dusseldorf": "99a5059f-7dca-466a-8c45-2a72d3168c46",
+    "frosinone": "77e946e4-69c3-4aae-8e0f-6d59765d047b",
+    "genoa": "3b4bd00b-84c5-4f75-9fd3-e590cf02c145",
+    "fiorentina": "5d7d3819-974f-45ca-9bce-7d52f87be3b5",
+    "udinese": "7d62bb03-8bb5-4316-96b4-d67a46e4da83",
+    "xanthi": "c8487b41-8a1b-44da-ac79-68471dfe874d",
+    "spal": "de750d63-fd3f-4907-82b5-caf273be11e2",
+    "cagliari": "9a0855ee-0982-480b-a20d-9e2a7003e84d",
+    "espanol": "9c6ea5ab-95e6-4736-8919-3a21e6c2484a",
+    "panionios": "191fad24-461c-45f6-8130-81745d543c49",
+    "olympiakos": "6f1e1f8a-9927-45aa-b37d-1ddb4ae19b36",
+    "mainz": "d562df72-2727-40cb-9082-b8f247bc979e",
+    "lamia": "393609d7-a1a8-458d-8aea-f7f8fc151c47",
+    "levante": "0d294d83-b065-4b9d-80d7-0e30526e8d91",
+    "hannover": "c878bd62-909e-4227-8cf9-20439a7e7c98",
+    "nurnberg": "9792730c-e03f-4eb7-8104-65b1ff693b04",
+    "asteras tripolis": "1ba83178-befe-408e-af53-db5b05e1acba",
+    "hoffenheim": "fecdde25-2c9a-4072-a20b-e4473c434f69",
+    "ein frankfurt": "02f14607-8863-40ae-9084-fb29289d3fef",
+    "augsburg": "8cb12015-3e0f-4eba-b180-1cd05a79b905",
+    "atromitos": "0a786a98-9976-4672-971c-5e45498636b5",
+    "panathinaikos": "526c9615-fd11-4ef8-aea3-951798dc3861",
+    "stuttgart": "3e568881-a209-4814-9fdd-18abbec998c9",
+    "schalke 04": "1ac5127c-367e-443f-9a99-dd7bdbebd938",
+    "aris": "dee4bad7-c08e-4e19-a9db-6a81d32b071e",
+    "sampdoria": "7549e246-5106-4a9d-be19-a5d35f8377fb",
+    "levadeiakos": "c2fd510d-9c8c-4127-ae7d-737bca712d36",
+    "huesca": "2033aba0-7ede-4988-8724-c7547954c6c6",
+    "ofi crete": "5fe14474-2b15-4945-bfc3-c68c1b783705",
+    "sociedad": "c986fe8d-9eb7-4fd2-bad5-2e1c78269070",
+    "larisa": "6212d9f8-ade1-471c-ae59-7f0cac6ef020",
+    "giannina": "ae4e2f9b-cadc-473f-a4b5-6380d8f0c5ec",
+    "twente": "15eb9e53-b2d2-4f3c-84e8-026c9326e170",
+    "mechelen": "052c5991-fa25-4629-9758-98e3f2bda8ee",
+    "barnsley": "cf9d08a8-d3a9-464e-81c0-baa91c28aedd",
+    "sparta rotterdam": "0ab12b1c-b72f-4104-b038-b3c34b93acea",
+    "brest": "74471980-d698-4480-937c-f7913b527beb",
+    "gil vicente": "cad83171-db5d-4a6d-bde4-b137200a5227",
+    "charlton": "b10c3922-3d69-45ba-aad2-c2c0cb8657c3",
+    "waalwijk": "2bf95216-f0f0-4ae2-a0d4-1cd4be32e3a3",
+    "famalicao": "f5b3d4e7-1ca9-4c5d-909f-e76282178157",
+    "mallorca": "330af598-77b4-46bc-b83e-1912fa8e8125",
+    "metz": "44135c14-c4e2-44e2-8435-667b4a3fb8cb",
+    "union berlin": "c233789a-5a25-49be-bf01-6e3abed4e48e",
+    "pacos ferreira": "eb0a7938-8be8-48d2-9cf3-9a65f0c0c10c",
+    "fc koln": "55d26ba0-07eb-4296-9a15-c0ce81828bac",
+    "granada": "92aa61da-78ae-43cf-80ad-0c58944968fa",
+    "osasuna": "e39763bd-526a-42c0-b3c7-f070814a51fd",
+    "paderborn": "03f27ba3-077b-4b8c-a949-cd465bcffdfd",
+    "verona": "7945ffa2-d0c3-43be-966d-5dc2688dadc9",
+    "volos nfc": "4c40ad5e-ed3e-4430-9c1f-1c41eaf4fda0",
+    "lecce": "9fef9eb8-ea91-4b6b-9ef8-92b40b9d4b92",
+    "brescia": "42ddc5e2-7459-4f9c-8dc7-8a446b1b2e99",
+    "oud-heverlee leuven": "f181df29-7e45-4815-84d6-5b71e1bbe69d",
+    "beerschot va": "039be493-205e-451e-b3dc-b487f79af7c9",
+    "lorient": "acd71801-dbec-42ba-894b-17c8bd75b850",
+    "lens": "dde9985c-c04f-478f-9f17-2eb7366c4e38",
+    "cadiz": "f5d85910-18dc-48d4-b236-960aade1de8d",
+    "wycombe": "fee943d6-9da1-4afa-821d-1ac337bd58b2",
+    "coventry": "90b1c00f-cf38-458c-adbb-6ba4fef1730b",
+    "bielefeld": "5ad8f3ac-3682-4662-81bc-45b43325dd15",
+    "elche": "9a54fa22-7ba9-4ef8-908a-267f2bda2a73",
+    "crotone": "de6d2c8e-3101-492e-8c09-9adbb94d2707",
+    "spezia": "0091017a-d939-42b4-a0bc-8ce7f549b888",
+    "farense": "d4e9934b-beff-42bb-b14e-4dc863f497a4",
+    "benevento": "27a3120d-482d-4cf5-99f1-62cf8fb82977",
+    "seraing": "4375f386-e7d9-44e0-a497-f99ff497c423",
+    "st. gilloise": "29abfce9-3592-4283-90b7-2fc004594b47",
+    "arouca": "dcb4f97f-0a2b-485a-8863-d9128b237a19",
+    "troyes": "d7daddd1-d7c5-4a02-a986-c5b92ff4e687",
+    "go ahead eagles": "c802a6e6-c044-490e-9fc9-bb1122b9ea5e",
+    "estoril": "9cb76579-6558-40f8-a13e-73ed37d00a60",
+    "vizela": "e3805437-2eaf-46e0-865a-fe1b5fe4a774",
+    "peterboro": "e742af22-ef2c-4689-b18f-ae94e0ac205c",
+    "blackpool": "98a3a3e4-7d40-48ac-970e-9f4ec651724a",
+    "clermont": "b507a320-8fd1-4dd9-8577-9359ddf71fb3",
+    "cambuur": "1c11d369-befa-467f-99be-cc4629435a97",
+    "nijmegen": "20cabcfb-3a3a-49af-b910-b58ea89acea6",
+    "greuther furth": "df55f8ff-d204-4c9e-95d0-f25713178bb0",
+    "bochum": "1cbf66ac-c126-427c-9453-ba4056a53e4b",
+    "salernitana": "275b5d43-3ef3-4807-abde-688d9f63b2fc",
+    "ionikos": "e38b76eb-a415-479e-9737-8334aab5b3f7",
+    "venezia": "918f26f9-13c6-48a2-afc5-6055de402997",
+    "westerlo": "bde71164-5c9e-41db-ae4c-c91d975498c9",
+    "sunderland": "a48f1ccf-4a1d-49fa-9f30-49975f5567b1",
+    "casa pia": "fec219b7-b593-4d6e-80b6-f108e32f94d4",
+    "monza": "8835fa6d-dfd3-40fc-ab54-781aec35be3e",
+    "volendam": "caeea24a-47d0-41a5-a4a2-443ce1f44edf",
+    "almeria": "dbde2f97-dd29-4441-b738-0328c9d5bd85",
+    "ajaccio": "c9d717b2-b422-4d02-a40a-7e9c1725065c",
+    "auxerre": "bab85f1d-a77d-4bf8-8000-aeb4cf9e8413",
+    "cremonese": "22ed40bd-63ce-41d9-a4eb-f0044b2f1fe8",
+    "rwd molenbeek": "ba905f59-58dd-416c-b6bf-28a57fe2da1a",
+    "plymouth": "75bb05a3-37cd-4076-bd9a-ff75a9cee580",
+    "las palmas": "da40d12c-eb21-4e62-94d2-66f2eea54d41",
+    "almere city": "fe537a76-c53f-48e9-a8ad-a8eb05471f4a",
+    "estrela": "a6b7abbe-898a-45b8-9345-06ac11ced11a",
+    "le havre": "c5a67496-d784-48dd-a6ca-d8d873f9801e",
+    "heidenheim": "1df32ebf-88e9-43ec-a203-7fce18debf16",
+    "darmstadt": "a3c55da6-fb2a-4ae9-89fd-24287b387378",
+    "kifisia": "c73d3e2f-656f-418d-bf6c-226c18b6daef",
+    "panserraikos": "7a0796d7-2170-4dc8-8761-f90266e8613f",
+    "dender": "31f34994-fa85-4f9d-8ce7-b4aace255942",
+    "avs": "695ce5ea-e414-4625-ae21-e3ede9cf7d75",
+    "oxford": "43280eb7-012f-42c9-98b0-7e02ea2f50e1",
+    "portsmouth": "adafea52-4c6e-4570-9b18-ce0d23420ed5",
+    "st pauli": "a991ddbe-2a33-4b9a-9afa-c630e049c4bc",
+    "holstein kiel": "0c281978-4232-4542-9b1d-cd86f548e40e",
+    "athens kallithea": "593a906f-3dc1-440d-9665-67d954060c37",
+    "como": "d6b47b8b-9a7c-43b5-9e8d-b9edb89fa743"
+  }
+}
