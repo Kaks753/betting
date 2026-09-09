@@ -43,7 +43,7 @@ from typing import Dict, List, Optional
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from kbet.db import Database, DB_PATH
-from kbet.daily_card import run_daily_card, Bet as DailyCardBet
+from kbet.daily_card import DailyCardEngine, Bet as DailyCardBet
 from kbet.engine.utils.clv_tracker import settle_clv, ClosingOddsFetcher, compute_clv
 
 # ── Logging ───────────────────────────────────────────────────────────────────
@@ -85,48 +85,39 @@ def generate_card(
     log.info(f"[CARD] Generating {target_date} card (simulate={simulate}) ...")
 
     try:
-        # Import and run the daily card engine
-        from daily_card import run_daily_card as _run
-        card = _run(
+        engine = DailyCardEngine(
             target_date=target_date,
-            leagues=leagues,
-            max_bets=max_bets,
-            min_bets=MIN_BETS,
             simulate=simulate,
+            leagues=leagues,
+            api_key=os.getenv("ODDS_API_KEY", ""),
         )
-    except ImportError:
-        # Fallback: use subprocess / direct call
-        import subprocess
-        cmd = [
-            sys.executable,
-            str(Path(__file__).parent / "daily_card.py"),
-            "--date", target_date,
-            "--leagues", *leagues,
-            "--max-bets", str(max_bets),
-            "--output-json",
-        ]
-        if simulate:
-            cmd.append("--simulate")
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        if result.returncode != 0:
-            log.error(f"[CARD] daily_card.py failed: {result.stderr[:500]}")
-            return None
-        try:
-            card = json.loads(result.stdout)
-        except json.JSONDecodeError:
-            # Try to extract JSON from mixed output
-            for line in result.stdout.split("\n"):
-                if line.strip().startswith("{"):
-                    try:
-                        card = json.loads(line.strip())
-                        break
-                    except Exception:
-                        continue
-            else:
-                log.error("[CARD] Could not parse card JSON from output")
-                return None
+        bets: List[DailyCardBet] = engine.run(max_bets=max_bets)
+
+        # Normalise to dict format expected downstream
+        card = {
+            "date": target_date,
+            "total_exposure": sum(getattr(b, "stake_pct", 0.0) for b in bets),
+            "bets": [
+                {
+                    "match_id":   getattr(b, "match_id", ""),
+                    "home":       getattr(b, "home", ""),
+                    "away":       getattr(b, "away", ""),
+                    "league":     getattr(b, "league", ""),
+                    "match_date": getattr(b, "match_date", target_date),
+                    "market":     getattr(b, "market", ""),
+                    "pick":       getattr(b, "pick", ""),
+                    "model_prob": getattr(b, "model_prob", 0.0),
+                    "book_odds":  getattr(b, "book_odds", 0.0),
+                    "ev":         getattr(b, "ev", 0.0),
+                    "stake_pct":  getattr(b, "stake_pct", 0.0),
+                    "stake_units": getattr(b, "stake_units", 0.0),
+                    "confidence": getattr(b, "confidence", "WATCH"),
+                }
+                for b in bets
+            ],
+        }
     except Exception as e:
-        log.error(f"[CARD] Card generation failed: {e}")
+        log.error(f"[CARD] Card generation failed: {e}", exc_info=True)
         return None
 
     n_bets = len(card.get("bets", []))
