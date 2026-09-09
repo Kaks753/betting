@@ -1,0 +1,34 @@
+# Render.com deployment config
+# Deploy from GitHub: https://render.com → New Web Service → Connect repo
+services:
+  - type: web
+    name: kbet-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn kbet.api.app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ODDS_API_KEY
+        sync: false        # Set this in Render dashboard
+      - key: ADMIN_TOKEN
+        sync: false        # Set in dashboard
+      - key: BANKROLL
+        value: "1000"
+      - key: MAX_BETS
+        value: "10"
+    disk:
+      name: kbet-data
+      mountPath: /opt/render/project/src/kbet/data
+      sizeGB: 1            # Free tier: 1GB
+
+cron:
+  # Daily card at 10:00 UTC
+  - name: kbet-daily-cron
+    runtime: python
+    plan: free
+    schedule: "0 10 * * *"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python3 kbet/cron_runner.py
+    envVars:
+      - key: ODDS_API_KEY
+        sync: false
