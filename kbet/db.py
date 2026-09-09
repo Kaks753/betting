@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
@@ -30,8 +31,15 @@ from typing import Any, Dict, List, Optional, Union
 
 log = logging.getLogger(__name__)
 
-DB_PATH = Path(__file__).parent / "data" / "kbet.db"
-DB_PATH.parent.mkdir(exist_ok=True)
+# DB_PATH — support env var override for Fly.io persistent volume (/data)
+# Default: kbet/data/kbet.db (local dev)
+# Fly.io: set DB_PATH=/data/kbet.db in fly.toml → persists across deploys
+_db_env = os.environ.get("DB_PATH")
+if _db_env:
+    DB_PATH = Path(_db_env)
+else:
+    DB_PATH = Path(__file__).parent / "data" / "kbet.db"
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 # ── Schema ────────────────────────────────────────────────────────────────────
 

@@ -1,0 +1,65 @@
+# Fly.io deployment config for KBet
+# Free tier: 3 shared-CPU VMs + 3GB persistent volume
+#
+# First-time deploy (run these 4 commands in your terminal):
+#   1. flyctl auth login
+#   2. flyctl apps create kbet-api          (or any unique name)
+#   3. flyctl volumes create kbet_data --size 3 --region iad
+#   4. flyctl deploy
+#
+# After deploy, set env vars:
+#   flyctl secrets set ODDS_API_KEY=your_key_here
+#   flyctl secrets set ADMIN_TOKEN=your_secret_token
+
+app = "kbet-api"
+primary_region = "iad"   # Washington DC — change to closest: lhr=London, cdg=Paris, sin=Singapore
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PYTHONPATH    = "/app"
+  DB_PATH       = "/data/kbet.db"    # ← Persistent volume mount — survives ALL redeploys
+  BANKROLL      = "1000"
+  MAX_BETS      = "10"
+  PORT          = "8080"
+
+[http_service]
+  internal_port       = 8080
+  force_https         = true
+  auto_stop_machines  = false    # Keep alive — don't sleep (unlike Render free)
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type       = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+[[vm]]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1
+
+# Persistent volume — 3GB free, mounted at /data
+# kbet.db lives here and NEVER resets on redeploy
+[[mounts]]
+  source      = "kbet_data"
+  destination = "/data"
+
+# Cron job — daily card at 10:00 UTC
+# Fly.io machines are used for scheduled tasks
+[[statics]]
+  # No static files needed
+
+# Health check
+[[services]]
+  protocol   = "tcp"
+  internal_port = 8080
+
+  [[services.http_checks]]
+    interval      = "10s"
+    timeout       = "5s"
+    grace_period  = "30s"
+    method        = "GET"
+    path          = "/"
