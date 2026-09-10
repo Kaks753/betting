@@ -262,13 +262,19 @@ async def run_cron(
     # Launch as background process — don't wait for it (model fitting takes 3-5min)
     log_path = Path(__file__).parent.parent / "logs" / f"cron_{date_str}.log"
     log_path.parent.mkdir(exist_ok=True)
-    with open(log_path, "w") as logf:
-        proc = subprocess.Popen(
-            cmd,
-            stdout=logf,
-            stderr=subprocess.STDOUT,
-            start_new_session=True,
-        )
+    env = os.environ.copy()
+    env["PYTHONUNBUFFERED"] = "1"   # Force stdout/stderr to flush immediately
+    # Ensure PYTHONPATH includes /app so kbet package resolves on Render
+    app_root = str(Path(__file__).parent.parent.parent)
+    env["PYTHONPATH"] = app_root + os.pathsep + env.get("PYTHONPATH", "")
+    logf = open(log_path, "w")
+    proc = subprocess.Popen(
+        cmd,
+        stdout=logf,
+        stderr=subprocess.STDOUT,
+        start_new_session=True,
+        env=env,
+    )
 
     return {
         "status":   "started",
