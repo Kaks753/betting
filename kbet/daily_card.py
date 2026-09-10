@@ -578,9 +578,35 @@ class DailyCardEngine:
                 "away": (best_odds_obj.away, "A"),
             }
 
+            # Pre-compute overround for sanity guard (reuse)
+            try:
+                or_val = (1/best_odds_obj.home)+(1/best_odds_obj.draw)+(1/best_odds_obj.away)
+            except Exception:
+                or_val = 1.05
+            MAX_SANE_EV = 0.20
+            WARN_EV = 0.12
             for side, (odds, pick) in odds_map.items():
                 blend_p = blended[side]
                 pin_p   = pin_probs[side]
+
+                # Sanity: odds plausible
+                if odds is None or odds <= 1.01 or odds > 20.0:
+                    continue
+                # Overround 0.98-1.15 else corrupted
+                if or_val < 0.98 or or_val > 1.15:
+                    logger.warning(f"[ODDS REJECT] {match.home_team} v {match.away_team}: overround={or_val:.3f}")
+                    break
+                if blend_p <= 0.01 or blend_p >= 0.99:
+                    continue
+
+                slip = CARD_CONFIG["slippage"]
+                ev = ((blend_p * odds) - 1.0) * (1 - slip)
+                # EV ceiling 20% hard, 12% soft warn
+                if ev > MAX_SANE_EV:
+                    logger.warning(f"[EV REJECT] {match.home_team} v {match.away_team} {pick}: EV={ev:.1%} >20% ceiling")
+                    continue
+                if ev > WARN_EV:
+                    logger.info(f"[EV WARN] {match.home_team} v {match.away_team} {pick}: EV={ev:.1%} verify")
 
                 # Must genuinely exceed Pinnacle
                 pin_gap = blend_p - pin_p
@@ -591,8 +617,6 @@ class DailyCardEngine:
                 if odds < CARD_CONFIG["min_odds"] or odds > CARD_CONFIG["max_odds"]:
                     continue
 
-                slip = CARD_CONFIG["slippage"]
-                ev = ((blend_p * odds) - 1.0) * (1 - slip)
                 if ev < CARD_CONFIG["1x2_ev_thresh"]:
                     continue
 
@@ -673,6 +697,13 @@ class DailyCardEngine:
                     continue
                 ev = ((prob * odds) - 1.0) * (1 - CARD_CONFIG["slippage"])
                 if ev < CARD_CONFIG["ou_ev_thresh"]:
+                    continue
+                if ev > 0.20:
+                    logger.warning(f"[EV REJECT] O/U {match.home_team} v {match.away_team} {side}: EV={ev:.1%} >20%")
+                    continue
+                if ev > 0.12:
+                    logger.info(f"[EV WARN] O/U {match.home_team} v {match.away_team} {side}: EV={ev:.1%}")
+                if odds is None or odds <= 1.01 or odds > 15.0:
                     continue
 
                 confidence = self._confidence_score(
@@ -948,22 +979,15 @@ class DailyCardEngine:
         ]
 
         if len(window_df) == 0:
-            # Widen to ±3 days for simulation
+            # Widen to ±1 day (NOT more) — some fixtures kick off after midnight UTC
             window_df = self.all_df[
                 (self.all_df["date"] >= target - pd.Timedelta(days=1)) &
-                (self.all_df["date"] <= target + pd.Timedelta(days=2))
+                (self.all_df["date"] <= target + pd.Timedelta(days=1))
             ]
 
         if len(window_df) == 0:
-            # No matches for this date — fallback to most recent matchday (for demo/today when parquet is historic)
-            latest_date = self.all_df["date"].max()
-            window_df = self.all_df[self.all_df["date"] == latest_date].copy()
-            # Re-label commence_time to target_date so card appears as today
-            if len(window_df) > 0:
-                window_df["date"] = target
-                print(f"  [FALLBACK] No matches for {self.target_date} — using latest available {latest_date.date()} ({len(window_df)} matches) labeled as today")
-
-        if len(window_df) == 0:
+            # HARD STOP: No historical matches for this date — NEVER rename historic dates to "today"
+            print(f"  [NO DATA] No fixtures for {self.target_date} in dataset — returning empty")
             return []
 
         # Apply league filter

@@ -101,10 +101,26 @@ def _auto_generate_card():
         db.migrate()
         existing = db.get_daily_summary(today)
         if existing:
-            log.info(f"[STARTUP] Card for {today} already exists ({existing['n_bets']} bets) — skip auto-gen")
-            return
+            # Freshness guard: skip if recent (<12h) and has bets
+            gen_at = existing.get("generated_at", "") or ""
+            try:
+                gen_dt = datetime.fromisoformat(gen_at.replace("Z", "+00:00"))
+                age_hours = (datetime.now(timezone.utc) - gen_dt).total_seconds() / 3600
+                n_bets = int(existing.get("n_bets", 0) or 0)
+                if n_bets > 0 and age_hours < 12:
+                    log.info(f"[STARTUP] Card for {today} is {age_hours:.1f}h old with {n_bets} bets — skip regen")
+                    return
+                if n_bets == 0:
+                    log.info(f"[STARTUP] Card for {today} exists but 0 bets — regenerating")
+                else:
+                    log.info(f"[STARTUP] Card for {today} is {age_hours:.1f}h old — regenerating")
+            except Exception:
+                # Fallback: if can't parse, respect n_bets
+                if int(existing.get("n_bets", 0) or 0) > 0:
+                    log.info(f"[STARTUP] Card for {today} already exists ({existing['n_bets']} bets) — skip")
+                    return
 
-        log.info(f"[STARTUP] No card for {today} — auto-generating in background...")
+        log.info(f"[STARTUP] No fresh card for {today} — auto-generating in background...")
 
         log_dir = Path(__file__).parent.parent / "logs"
         log_dir.mkdir(exist_ok=True)
@@ -115,21 +131,22 @@ def _auto_generate_card():
             str(Path(__file__).parent.parent / "cron_runner.py"),
             "--date", today,
             "--card-only",
-            "--simulate",   # safe default; use live when ODDS_API_KEY is set
         ]
+        api_key = os.environ.get("ODDS_API_KEY", "").strip()
+        is_prod = os.environ.get("KBET_ENV", "").lower() == "production"
+        if not api_key or api_key == "your_key_here":
+            if is_prod:
+                log.error("[STARTUP] No ODDS_API_KEY in production — refusing to generate SIMULATED card")
+                return
+            log.info("[STARTUP] No ODDS_API_KEY — using SIMULATE mode (dev)")
+            cmd.append("--simulate")
+        else:
+            log.info("[STARTUP] ODDS_API_KEY detected — using LIVE mode")
 
         env = os.environ.copy()
         env["PYTHONUNBUFFERED"] = "1"
         app_root = str(Path(__file__).parent.parent.parent)
         env["PYTHONPATH"] = app_root + os.pathsep + env.get("PYTHONPATH", "")
-
-        # Use live mode if API key is set
-        api_key = os.environ.get("ODDS_API_KEY", "")
-        if api_key and api_key != "your_key_here":
-            cmd.remove("--simulate")
-            log.info("[STARTUP] ODDS_API_KEY detected — using LIVE mode")
-        else:
-            log.info("[STARTUP] No ODDS_API_KEY — using SIMULATE mode (historical data)")
 
         with open(log_path, "w") as logf:
             proc = subprocess.Popen(
@@ -191,6 +208,40 @@ async def api_health() -> Dict:
         "db_exists": db_exists,
         "service":   "KBet — Football Betting Analytics",
         "endpoints": ["/card/today", "/card/{date}", "/performance", "/clv", "/bets"],
+    }
+
+
+# ── Mode (live vs simulated) ────────────────────────────────────────────
+
+@app.get("/api/mode", tags=["health"])
+async def api_mode() -> Dict:
+    """Report whether system is LIVE or SIMULATED — transparency."""
+    api_key = os.environ.get("ODDS_API_KEY", "").strip()
+    env = os.environ.get("KBET_ENV", "development").lower()
+    is_live = bool(api_key) and env == "production"
+    db = Database()
+    db.migrate()
+    today = date.today().strftime("%Y-%m-%d")
+    summary = db.get_daily_summary(today)
+    age_hours = None
+    if summary:
+        try:
+            gen_at = (summary.get("generated_at") or "").replace("Z", "+00:00")
+            gen_dt = datetime.fromisoformat(gen_at)
+            age_hours = round((datetime.now(timezone.utc) - gen_dt).total_seconds() / 3600, 1)
+        except Exception:
+            pass
+    return {
+        "mode": "LIVE" if is_live else "SIMULATED",
+        "environment": env,
+        "has_api_key": bool(api_key),
+        "today_card": {
+            "exists": summary is not None,
+            "n_bets": (summary or {}).get("n_bets", 0),
+            "age_hours": age_hours,
+            "generated_at": (summary or {}).get("generated_at", ""),
+        },
+        "warning": None if is_live else "SIMULATED MODE: Card from historical data, not for real betting.",
     }
 
 

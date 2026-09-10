@@ -372,6 +372,20 @@ def log_performance(db: Database, target_date: str) -> None:
 def main(args: argparse.Namespace) -> None:
     t0 = time.time()
 
+    # Production guard — refuse to serve stale historic as live
+    is_production = os.environ.get("KBET_ENV", "").lower() == "production"
+    has_api_key = bool(os.environ.get("ODDS_API_KEY", "").strip())
+    if not args.simulate and not has_api_key:
+        log.error("[GUARD] No ODDS_API_KEY and not in --simulate mode. Refusing to generate stale historic card.")
+        if is_production:
+            sys.exit(1)
+        else:
+            log.warning("[GUARD] Dev: continuing in simulate mode")
+            args.simulate = True
+    if is_production and args.simulate:
+        log.error("[GUARD] Cannot run --simulate in production. Set KBET_ENV != production for backtest, or supply ODDS_API_KEY for live.")
+        sys.exit(1)
+
     target_date = args.date or date.today().strftime("%Y-%m-%d")
     yesterday   = (datetime.strptime(target_date, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
     simulate    = args.simulate
@@ -379,7 +393,7 @@ def main(args: argparse.Namespace) -> None:
     markets     = args.markets or DEFAULT_MARKETS
 
     log.info("=" * 60)
-    log.info(f"KBet Cron — {target_date} ({'SIMULATE' if simulate else 'LIVE'})")
+    log.info(f"KBet Cron — {target_date} ({'SIMULATE' if simulate else 'LIVE'}) env={os.environ.get('KBET_ENV','dev')}")
     log.info("=" * 60)
 
     # Initialise DB
@@ -395,10 +409,12 @@ def main(args: argparse.Namespace) -> None:
             log.info("      Use --force to regenerate")
         else:
             card = generate_card(target_date, leagues, markets, simulate, args.max_bets)
-            if card:
+            if card and len(card.get("bets", [])) > 0:
                 persist_card(db, card, target_date, leagues, markets)
                 # Print card summary
                 _print_card(card, target_date)
+            elif card and len(card.get("bets", [])) == 0:
+                log.warning(f"[CARD] No genuine bets for {target_date} — not persisting empty card")
             else:
                 log.error("[CARD] Card generation failed")
 
