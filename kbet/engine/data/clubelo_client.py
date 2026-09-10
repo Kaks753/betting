@@ -59,9 +59,12 @@ class ClubEloClient:
 
     def __init__(
         self,
-        cache_dir: str = "/home/user/webapp/kbet/data/elo_cache",
+        cache_dir: str = None,
         timeout: int = 12,
     ):
+        if cache_dir is None:
+            base = Path(os.environ.get("DATA_DIR", str(Path(__file__).parent.parent.parent / "data")))
+            cache_dir = str(base / "elo_cache")
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.timeout = timeout

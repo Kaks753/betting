@@ -143,7 +143,10 @@ class WeatherClient:
     cache_dir : directory for caching weather responses (24h TTL).
     """
 
-    def __init__(self, cache_dir: str = "/home/user/webapp/kbet/data/weather_cache"):
+    def __init__(self, cache_dir: str = None):
+        if cache_dir is None:
+            base = Path(os.environ.get("DATA_DIR", str(Path(__file__).parent.parent.parent / "data")))
+            cache_dir = str(base / "weather_cache")
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.session = requests.Session()

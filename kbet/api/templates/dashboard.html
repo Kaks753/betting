@@ -958,21 +958,26 @@
       if (!resp) return;
       if (resp.ok) {
         const data = await resp.json();
-        if (data.n_bets > 0) {
-          stopPolling();
-          _sampleLoaded = false;  // allow re-render with real data
-          cardData = data;
-          renderCard(data);
-          showToast('✅ Live card ready — ' + data.n_bets + ' bets found!', 4000);
-          loadStatus();
+        const pBets = Number(data.n_bets) || (Array.isArray(data.bets)? data.bets.length:0);
+        if (pBets > 0) {
+          // Only replace sample if this is a non-demo (real) card or sample was never shown
+          const isDemo = data.demo_mode === true;
+          if (!isDemo || !_sampleLoaded) {
+            stopPolling();
+            _sampleLoaded = false;
+            cardData = data;
+            renderCard(data);
+            showToast('✅ Live card ready — ' + pBets + ' bets found!', 4000);
+            loadStatus();
+          } else if (pollCount > 45) {
+            stopPolling();
+            showToast('ℹ️ Showing sample card — live card not yet ready', 4000);
+          }
         } else if (pollCount > 45) {
-          // Timed out — model probably failed or no matches for this date
           stopPolling();
           showToast('⚠️ No bets found for today (simulate mode / no live data)', 6000);
         }
-        // else: card exists but 0 bets — keep polling
       }
-      // 404: still generating — keep polling
     }, 15000);
   }
 
@@ -1155,10 +1160,12 @@
       const data = await resp.json();
       cardData = data;
 
-      if (data.n_bets === 0) {
+      const nBets = Number(data.n_bets) || 0;
+      if (nBets === 0) {
         const today = new Date().toISOString().split('T')[0];
-        if (currentDate === today) {
-          // n_bets=0 means either still generating or simulate mode with no matches for today
+        // UTC-safe today check + len(bets) guard — handles string "0" and stale DB rows
+        const hasBets = Array.isArray(data.bets) && data.bets.length > 0;
+        if (currentDate === today && !hasBets) {
           _loadSampleCard(true);
           return;
         }
@@ -1175,17 +1182,40 @@
   // ── Load sample/latest card as fallback while today's card isn't ready ──
   let _sampleLoaded = false;
   async function _loadSampleCard(showNote) {
-    if (!_sampleLoaded) {
-      try {
-        const r2 = await fetch(API + '/card/latest');
-        if (r2.ok) {
-          const sample = await r2.json();
+    // Allow retry if previous sample empty — only block re-fetch after successful render
+    try {
+      const r2 = await fetch(API + '/card/latest');
+      if (r2.ok) {
+        const sample = await r2.json();
+        const sampleBets = Number(sample.n_bets) || (Array.isArray(sample.bets) ? sample.bets.length : 0);
+        if (sampleBets > 0) {
           _sampleLoaded = true;
           cardData = sample;
           renderCard(sample);
-          // After rendering, also start polling so today's real card replaces it when ready
           if (!polling) startPolling();
           return;
+        }
+      }
+    } catch(e) {}
+    // Fallback to any available card by date scan (handles DB empty but JSON present with different name)
+    if (!_sampleLoaded) {
+      try {
+        const fallbackDates = ['2023-09-16','2023-09-17','2023-09-15','2023-09-10'];
+        for (const d of fallbackDates) {
+          const r3 = await fetch(API + '/card/' + d).catch(()=>null);
+          if (r3 && r3.ok) {
+            const fd = await r3.json();
+            const fb = Number(fd.n_bets) || (Array.isArray(fd.bets)? fd.bets.length:0);
+            if (fb > 0) {
+              fd.demo_mode = true;
+              fd.demo_note = 'Sample card from ' + d + ' (historical backtest)';
+              _sampleLoaded = true;
+              cardData = fd;
+              renderCard(fd);
+              if (!polling) startPolling();
+              return;
+            }
+          }
         }
       } catch(e) {}
     }

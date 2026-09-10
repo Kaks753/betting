@@ -197,10 +197,13 @@ class OddsAPIClient:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        cache_dir: str = "/home/user/webapp/kbet/data/odds_cache",
+        cache_dir: str = None,
         rate_limit_s: float = 0.5,
     ):
         self.api_key = api_key or os.getenv("ODDS_API_KEY", "")
+        if cache_dir is None:
+            base = Path(os.environ.get("DATA_DIR", str(Path(__file__).parent.parent.parent / "data")))
+            cache_dir = str(base / "odds_cache")
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.rate_limit_s = rate_limit_s

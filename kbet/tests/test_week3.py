@@ -459,7 +459,7 @@ class TestAPISmoke:
         db_module.DB_PATH = original_path
 
     def test_health_check(self, client):
-        resp = client.get("/")
+        resp = client.get("/api/health")
         assert resp.status_code == 200
         data = resp.json()
         assert data["status"] == "ok"

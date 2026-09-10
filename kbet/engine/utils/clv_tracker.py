@@ -39,8 +39,16 @@ import requests
 log = logging.getLogger(__name__)
 
 BASE_URL      = "https://api.the-odds-api.com/v4"
-DB_PATH       = Path(__file__).parent.parent.parent / "data" / "kbet.db"
-CACHE_DIR     = Path(__file__).parent.parent.parent / "data" / "closing_odds_cache"
+_db_env = os.environ.get("DB_PATH")
+if _db_env:
+    DB_PATH = Path(_db_env)
+else:
+    _data_dir = Path(os.environ.get("DATA_DIR", str(Path(__file__).parent.parent.parent / "data")))
+    DB_PATH = _data_dir / "kbet.db"
+    # legacy path fallback
+    if not DB_PATH.exists() and (Path(__file__).parent.parent.parent / "data" / "kbet.db").exists():
+        DB_PATH = Path(__file__).parent.parent.parent / "data" / "kbet.db"
+CACHE_DIR     = Path(os.environ.get("DATA_DIR", str(Path(__file__).parent.parent.parent / "data"))) / "closing_odds_cache"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 SPORT_KEYS = {

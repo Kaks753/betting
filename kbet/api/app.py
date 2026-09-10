@@ -220,33 +220,64 @@ async def get_latest_card(db: Database = Depends(get_db)) -> Dict:
     except Exception:
         pass
 
-    # Try JSON fallback files in repo
-    json_dir = Path(__file__).parent.parent / "data" / "daily_cards"
-    if json_dir.exists():
+    # Try JSON fallback files — check DATA_DIR first, then repo dir
+    search_dirs = []
+    data_dir_env = os.environ.get("DATA_DIR")
+    if data_dir_env:
+        search_dirs.append(Path(data_dir_env) / "daily_cards")
+    search_dirs.append(Path(__file__).parent.parent / "data" / "daily_cards")
+    seen = set()
+    for json_dir in search_dirs:
+        if not json_dir.exists():
+            continue
         card_files = sorted(json_dir.glob("card_*.json"), reverse=True)
         for cf in card_files:
+            if cf.resolve() in seen:
+                continue
+            seen.add(cf.resolve())
             try:
                 with open(cf) as f:
                     data = json.load(f)
-                bets = data.get("bets") or data.get("actionable", [])
+                # Handle both keys: "bets" (new) and "actionable" (legacy v1)
+                bets = data.get("bets")
+                if not bets:
+                    bets = data.get("actionable", [])
+                if not isinstance(bets, list):
+                    bets = []
+                # Also handle count fields
+                if len(bets) == 0 and isinstance(data.get("total_bets"), int) and data["total_bets"] > 0:
+                    # Some files use total_bets but empty bets due to partial write — skip
+                    continue
                 if len(bets) > 0:
                     run_date = data.get("date", cf.stem.replace("card_", ""))
                     if len(run_date) == 8 and "-" not in run_date:
                         run_date = f"{run_date[:4]}-{run_date[4:6]}-{run_date[6:]}"
+                    # Normalise bet shape — ensure required keys
+                    normed = []
+                    for b in bets:
+                        if not isinstance(b, dict):
+                            continue
+                        # Legacy files used "book_odds" vs "odds"
+                        if "odds" not in b and "book_odds" in b:
+                            b["odds"] = b["book_odds"]
+                        normed.append(b)
+                    if not normed:
+                        continue
                     return {
                         "date":            run_date,
                         "generated_at":    data.get("generated_at", ""),
-                        "n_bets":          len(bets),
-                        "leagues":         list({b.get("league", "") for b in bets if b.get("league")}),
-                        "markets":         list({b.get("market", "") for b in bets if b.get("market")}),
+                        "n_bets":          len(normed),
+                        "leagues":         list({b.get("league", "") for b in normed if b.get("league")}),
+                        "markets":         list({b.get("market", "") for b in normed if b.get("market")}),
                         "total_exposure":  data.get("total_exposure", 0),
                         "bankroll_start":  1000.0,
                         "settled_summary": {"total": 0, "won": 0, "lost": 0, "pending": 0, "total_pnl": 0, "avg_clv": None},
-                        "bets":            bets,
+                        "bets":            normed,
                         "demo_mode":       True,
                         "demo_note":       "Sample card (historical backtest — live card requires ODDS_API_KEY)",
                     }
-            except Exception:
+            except Exception as e:
+                log.warning(f"[LATEST] Failed to read {cf}: {e}")
                 continue
 
     raise HTTPException(status_code=404, detail="No cards with bets found.")
@@ -325,10 +356,15 @@ async def get_card_by_date(
     except Exception:
         pass
 
+    # Coerce n_bets to int — DB may store as string in some deploys
+    try:
+        n_bets_val = int(summary.get("n_bets", len(card_bets)))
+    except Exception:
+        n_bets_val = len(card_bets)
     return {
         "date":            run_date,
         "generated_at":    summary.get("generated_at", ""),
-        "n_bets":          summary.get("n_bets", len(card_bets)),
+        "n_bets":          n_bets_val,
         "leagues":         _safe_json(summary.get("leagues", "[]")),
         "markets":         _safe_json(summary.get("markets", "[]")),
         "total_exposure":  summary.get("total_exposure", 0),
