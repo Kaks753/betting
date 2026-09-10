@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KBet — Football Betting Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #080c14;
+      --bg2:      #0d1320;
+      --bg3:      #111827;
+      --card:     #131d2e;
+      --card2:    #1a2540;
+      --border:   #1f2f47;
+      --border2:  #263550;
+      --accent:   #3b82f6;
+      --accent2:  #60a5fa;
+      --green:    #10b981;
+      --green2:   #34d399;
+      --yellow:   #f59e0b;
+      --yellow2:  #fbbf24;
+      --red:      #ef4444;
+      --red2:     #f87171;
+      --text:     #e2e8f0;
+      --text2:    #94a3b8;
+      --text3:    #64748b;
+      --gold:     #f59e0b;
+      --glow:     rgba(59,130,246,0.15);
+      --glow2:    rgba(16,185,129,0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Animated background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(59,130,246,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(16,185,129,0.05) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Header ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8,12,20,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--green));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px rgba(59,130,246,0.3);
+    }
+
+    .logo-text {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-sub {
+      font-size: 0.65rem;
+      font-weight: 500;
+      color: var(--text3);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.25);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--green2);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .date-badge {
+      padding: 5px 12px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text2);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .refresh-btn {
+      width: 34px;
+      height: 34px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text2);
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .refresh-btn:hover { background: var(--card2); color: var(--accent2); border-color: var(--border2); }
+    .refresh-btn.spinning { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Main layout ── */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* ── Page title ── */
+    .page-header {
+      margin-bottom: 2rem;
+    }
+
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .page-sub {
+      font-size: 0.875rem;
+      color: var(--text3);
+    }
+
+    /* ── Stat cards row ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .stat-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--stat-color, var(--accent));
+      opacity: 0.7;
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text3);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-sub {
+      font-size: 0.75rem;
+      color: var(--text3);
+      margin-top: 6px;
+    }
+
+    /* ── Two-column layout ── */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1100px) { .content-grid { grid-template-columns: 1fr; } }
+
+    /* ── Section headers ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .section-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .section-icon.blue  { background: rgba(59,130,246,0.12); color: var(--accent2); }
+    .section-icon.green { background: rgba(16,185,129,0.12); color: var(--green2); }
+    .section-icon.gold  { background: rgba(245,158,11,0.12); color: var(--yellow2); }
+
+    .bet-count-badge {
+      padding: 3px 10px;
+      background: rgba(59,130,246,0.12);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--accent2);
+    }
+
+    /* ── Bet cards ── */
+    .bets-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .bet-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bet-card:hover {
+      border-color: var(--border2);
+      background: var(--card2);
+      transform: translateX(2px);
+    }
+
+    .bet-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--bet-color, var(--accent));
+      border-radius: 3px 0 0 3px;
+    }
+
+    .bet-rank {
+      width: 36px;
+      height: 36px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text3);
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    .bet-main {
+      min-width: 0;
+    }
+
+    .bet-match {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bet-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .bet-tag {
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .tag-league   { background: rgba(100,116,139,0.15); color: var(--text3); }
+    .tag-market   { background: rgba(59,130,246,0.1);  color: var(--accent2); border: 1px solid rgba(59,130,246,0.15); }
+    .tag-under    { background: rgba(59,130,246,0.1);  color: #7dd3fc; }
+    .tag-over     { background: rgba(239,68,68,0.1);   color: #fca5a5; }
+    .tag-home     { background: rgba(16,185,129,0.1);  color: var(--green2); }
+    .tag-away     { background: rgba(245,158,11,0.1);  color: var(--yellow2); }
+    .tag-draw     { background: rgba(148,163,184,0.1); color: var(--text2); }
+
+    .bet-time {
+      font-size: 0.68rem;
+      color: var(--text3);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .bet-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .bet-ev {
+      font-size: 1.05rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .ev-positive { color: var(--green2); }
+    .ev-neutral  { color: var(--yellow2); }
+
+    .bet-odds {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text2);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .bet-stars {
+      display: flex;
+      gap: 2px;
+    }
+
+    .star-filled { color: var(--gold); font-size: 11px; }
+    .star-empty  { color: var(--border2); font-size: 11px; }
+
+    /* ── Right sidebar ── */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .panel-body {
+      padding: 1.25rem;
+    }
+
+    /* ── Performance chart bars ── */
+    .perf-stat {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .perf-stat:last-child { border-bottom: none; }
+
+    .perf-label { font-size: 0.78rem; color: var(--text2); }
+    .perf-value { font-size: 0.82rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+    .perf-value.positive { color: var(--green2); }
+    .perf-value.negative { color: var(--red2); }
+    .perf-value.neutral  { color: var(--text2); }
+
+    /* ── Market breakdown ── */
+    .market-bar {
+      margin-bottom: 12px;
+    }
+    .market-bar:last-child { margin-bottom: 0; }
+
+    .market-bar-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 0.75rem;
+    }
+    .market-name { color: var(--text2); font-weight: 500; }
+    .market-pct  { color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+
+    .bar-track {
+      height: 4px;
+      background: var(--bg3);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--accent);
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ── League breakdown ── */
+    .league-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .league-item:last-child { border-bottom: none; }
+
+    .league-flag {
+      width: 22px;
+      height: 16px;
+      border-radius: 3px;
+      background: var(--bg3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .league-name  { font-size: 0.78rem; color: var(--text2); flex: 1; }
+    .league-count { font-size: 0.75rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--text3); }
+
+    /* ── System status ── */
+    .status-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.78rem;
+    }
+    .status-item:last-child { border-bottom: none; }
+    .status-key   { color: var(--text3); }
+    .status-val   { font-family: 'JetBrains Mono', monospace; color: var(--text2); font-size: 0.72rem; }
+    .status-ok    { color: var(--green2); font-weight: 600; }
+    .status-warn  { color: var(--yellow2); font-weight: 600; }
+
+    /* ── Loading state ── */
+    .loading-overlay {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      gap: 1rem;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .loading-text { color: var(--text3); font-size: 0.875rem; }
+
+    /* ── Empty / error states ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 8px;
+    }
+
+    .empty-sub {
+      font-size: 0.82rem;
+      color: var(--text3);
+      max-width: 280px;
+      line-height: 1.5;
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 8px 14px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text3);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .tab:hover { color: var(--text2); }
+
+    .tab.active {
+      background: var(--card2);
+      color: var(--text);
+      border: 1px solid var(--border2);
+      font-weight: 600;
+    }
+
+    /* ── Date navigator ── */
+    .date-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+    }
+
+    .date-nav-btn {
+      width: 34px;
+      height: 34px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text2);
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .date-nav-btn:hover { background: var(--card2); color: var(--accent2); }
+
+    .date-nav-label {
+      flex: 1;
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Tooltips ── */
+    [data-tip] { position: relative; cursor: help; }
+    [data-tip]::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font-size: 0.7rem;
+      padding: 5px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 200;
+    }
+    [data-tip]:hover::after { opacity: 1; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--card2);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      z-index: 999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ── Confidence badges ── */
+    .conf-fire   { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+    .conf-solid  { background: rgba(16,185,129,0.12); color: var(--green2); border: 1px solid rgba(16,185,129,0.2); }
+    .conf-watch  { background: rgba(245,158,11,0.1);  color: var(--yellow2); border: 1px solid rgba(245,158,11,0.15); }
+
+    /* ── Model indicator ── */
+    .model-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.15);
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--accent2);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      main { padding: 1rem; }
+      .bet-card { grid-template-columns: auto 1fr; }
+      .bet-right { display: none; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ── Animate in ── */
+    .fade-in { animation: fadeIn 0.4s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .stagger-1 { animation-delay: 0.05s; opacity: 0; }
+    .stagger-2 { animation-delay: 0.10s; opacity: 0; }
+    .stagger-3 { animation-delay: 0.15s; opacity: 0; }
+    .stagger-4 { animation-delay: 0.20s; opacity: 0; }
+    .stagger-5 { animation-delay: 0.25s; opacity: 0; }
+
+    /* ── Top bar highlight for huge EV ── */
+    .bet-card.fire-bet {
+      border-color: rgba(239,68,68,0.3);
+      background: linear-gradient(135deg, var(--card), rgba(239,68,68,0.04));
+    }
+    .bet-card.fire-bet:hover {
+      border-color: rgba(239,68,68,0.4);
+    }
+    .bet-card.fire-bet::before { background: var(--red); }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="/">
+      <div class="logo-icon">⚡</div>
+      <div>
+        <div class="logo-text">KBet</div>
+        <div class="logo-sub">Dixon-Coles Intelligence</div>
+      </div>
+    </a>
+    <div class="header-right">
+      <div class="status-badge" id="systemStatus">
+        <div class="status-dot"></div>
+        <span>Live</span>
+      </div>
+      <div class="date-badge" id="headerDate">—</div>
+      <button class="refresh-btn" id="refreshBtn" title="Refresh card" onclick="refreshCard()">↻</button>
+    </div>
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<main>
+  <!-- Page header -->
+  <div class="page-header fade-in">
+    <div class="page-title">Daily Bet Card</div>
+    <div class="page-sub">Value bets identified by Dixon-Coles + calibrated model</div>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card fade-in stagger-1" style="--stat-color: var(--accent)">
+      <div class="stat-label">Today's Bets</div>
+      <div class="stat-value" id="statBets">—</div>
+      <div class="stat-sub" id="statBetsSub">Loading…</div>
+    </div>
+    <div class="stat-card fade-in stagger-2" style="--stat-color: var(--green)">
+      <div class="stat-label">Best EV</div>
+      <div class="stat-value" id="statBestEV">—</div>
+      <div class="stat-sub" id="statBestEVSub">top pick edge</div>
+    </div>
+    <div class="stat-card fade-in stagger-3" style="--stat-color: var(--yellow)">
+      <div class="stat-label">Avg Odds</div>
+      <div class="stat-value" id="statAvgOdds">—</div>
+      <div class="stat-sub">decimal format</div>
+    </div>
+    <div class="stat-card fade-in stagger-4" style="--stat-color: var(--accent)">
+      <div class="stat-label">Leagues</div>
+      <div class="stat-value" id="statLeagues">—</div>
+      <div class="stat-sub" id="statLeaguesSub">coverage today</div>
+    </div>
+    <div class="stat-card fade-in stagger-5" style="--stat-color: var(--green)">
+      <div class="stat-label">Model</div>
+      <div class="stat-value" style="font-size:1.1rem; padding-top:6px">Dixon-Coles</div>
+      <div class="stat-sub">+ ELO calibration</div>
+    </div>
+  </div>
+
+  <!-- Date navigator -->
+  <div class="date-nav fade-in">
+    <button class="date-nav-btn" onclick="changeDate(-1)">←</button>
+    <div class="date-nav-label" id="dateLabel">—</div>
+    <button class="date-nav-btn" onclick="changeDate(+1)" id="nextDateBtn">→</button>
+  </div>
+
+  <!-- Content grid -->
+  <div class="content-grid">
+
+    <!-- Bet list (left) -->
+    <div>
+      <div class="section-header">
+        <div class="section-title">
+          <div class="section-icon blue">🎯</div>
+          Value Bets
+        </div>
+        <div id="betCountBadge" class="bet-count-badge">0 bets</div>
+      </div>
+
+      <div id="betsList" class="bets-list">
+        <div class="panel">
+          <div class="loading-overlay">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading today's card…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar (right) -->
+    <div class="sidebar">
+
+      <!-- Market breakdown -->
+      <div class="panel fade-in">
+        <div class="panel-header">
+          <span>📊</span> Markets
+        </div>
+        <div class="panel-body" id="marketsPanel">
+          <div style="color:var(--text3);font-size:.78rem;text-align:center;padding:1rem 0">Loading…</div>
+        </div>
+      </div>
+
+      <!-- Leagues -->
+      <div class="panel fade-in">
+        <div class="panel-header">
+          <span>🌍</span> Leagues
+        </div>
+        <div class="panel-body" id="leaguesPanel">
+          <div style="color:var(--text3);font-size:.78rem;text-align:center;padding:1rem 0">Loading…</div>
+        </div>
+      </div>
+
+      <!-- Performance -->
+      <div class="panel fade-in">
+        <div class="panel-header">
+          <span>📈</span> Performance (30d)
+        </div>
+        <div class="panel-body" id="perfPanel">
+          <div style="color:var(--text3);font-size:.78rem;text-align:center;padding:1rem 0">Loading…</div>
+        </div>
+      </div>
+
+      <!-- System status -->
+      <div class="panel fade-in">
+        <div class="panel-header">
+          <span>🔧</span> System
+        </div>
+        <div class="panel-body" id="systemPanel">
+          <div style="color:var(--text3);font-size:.78rem;text-align:center;padding:1rem 0">Loading…</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+  // ── State ──
+  const API = '';
+  let currentDate = new Date().toISOString().split('T')[0];
+  let cardData    = null;
+
+  // ── Utils ──
+  function fmt(n, dec=2) { return (n ?? 0).toFixed(dec); }
+  function fmtEV(ev) {
+    const pct = (ev * 100).toFixed(1);
+    return (ev >= 0 ? '+' : '') + pct + '%';
+  }
+  function fmtOdds(o) { return o ? Number(o).toFixed(2) : '—'; }
+
+  function showToast(msg, dur=3000) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), dur);
+  }
+
+  // ── Date helpers ──
+  function offsetDate(d, days) {
+    const dt = new Date(d + 'T12:00:00');
+    dt.setDate(dt.getDate() + days);
+    return dt.toISOString().split('T')[0];
+  }
+
+  function changeDate(delta) {
+    const newDate = offsetDate(currentDate, delta);
+    const today   = new Date().toISOString().split('T')[0];
+    if (newDate > today) { showToast('No future cards available'); return; }
+    currentDate = newDate;
+    loadCard();
+  }
+
+  function updateDateLabel() {
+    const today   = new Date().toISOString().split('T')[0];
+    const isToday = currentDate === today;
+    document.getElementById('dateLabel').textContent =
+      isToday ? `Today — ${currentDate}` : currentDate;
+    document.getElementById('nextDateBtn').style.opacity =
+      currentDate === today ? '0.3' : '1';
+    document.getElementById('headerDate').textContent = currentDate;
+  }
+
+  // ── League info ──
+  const LEAGUES = {
+    E0:  { name: 'Premier League',   flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+    E1:  { name: 'Championship',     flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+    SP1: { name: 'La Liga',          flag: '🇪🇸' },
+    D1:  { name: 'Bundesliga',       flag: '🇩🇪' },
+    I1:  { name: 'Serie A',          flag: '🇮🇹' },
+    F1:  { name: 'Ligue 1',          flag: '🇫🇷' },
+    N1:  { name: 'Eredivisie',       flag: '🇳🇱' },
+    P1:  { name: 'Primeira Liga',    flag: '🇵🇹' },
+    B1:  { name: 'Pro League',       flag: '🇧🇪' },
+    G1:  { name: 'Super League',     flag: '🇬🇷' },
+  };
+
+  function leagueName(code) { return LEAGUES[code]?.name || code; }
+  function leagueFlag(code) { return LEAGUES[code]?.flag || '🌍'; }
+
+  // ── Pick tag class ──
+  function pickClass(pick) {
+    if (!pick) return '';
+    const p = pick.toLowerCase();
+    if (p === 'h' || p === 'home') return 'tag-home';
+    if (p === 'a' || p === 'away') return 'tag-away';
+    if (p === 'd' || p === 'draw') return 'tag-draw';
+    if (p.startsWith('under') || p.startsWith('u')) return 'tag-under';
+    if (p.startsWith('over')  || p.startsWith('o')) return 'tag-over';
+    return 'tag-market';
+  }
+
+  function pickLabel(pick) {
+    if (!pick) return '—';
+    const map = { H: 'Home Win', D: 'Draw', A: 'Away Win',
+                  O2: 'Over 2.5', U2: 'Under 2.5', Over: 'Over', Under: 'Under' };
+    return map[pick] || pick;
+  }
+
+  // ── Market label ──
+  function mktLabel(m) {
+    if (!m) return '—';
+    if (m.includes('O/U') || m.includes('ou') || m.toLowerCase().includes('goal')) return '⚽ Goals';
+    if (m.toLowerCase().includes('corner')) return '🚩 Corners';
+    if (m.toLowerCase().includes('card'))   return '🟥 Cards';
+    if (m === '1x2' || m === '1X2')         return '🏆 1X2';
+    return m;
+  }
+
+  // ── Build star HTML ──
+  function starsHtml(n, max=5) {
+    let h = '';
+    for (let i = 1; i <= max; i++)
+      h += `<span class="${i <= n ? 'star-filled' : 'star-empty'}">★</span>`;
+    return h;
+  }
+
+  // ── Confidence label ──
+  function confInfo(c) {
+    // c might be float 0-1 or string
+    if (typeof c === 'number') {
+      if (c >= 0.7) return { cls: 'conf-fire',  label: '🔥 Fire' };
+      if (c >= 0.4) return { cls: 'conf-solid', label: '✅ Solid' };
+      return             { cls: 'conf-watch', label: '👀 Watch' };
+    }
+    const s = (c || '').toString().toUpperCase();
+    if (s === 'FIRE') return { cls: 'conf-fire',  label: '🔥 Fire' };
+    if (s === 'SOLID')return { cls: 'conf-solid', label: '✅ Solid' };
+    return                   { cls: 'conf-watch', label: '👀 Watch' };
+  }
+
+  // ── Render a single bet card ──
+  function renderBet(bet, idx) {
+    const ev       = parseFloat(bet.ev || 0);
+    const odds     = parseFloat(bet.odds || bet.book_odds || 0);
+    const mp       = parseFloat(bet.model_prob || 0);
+    const stars    = parseInt(bet.stars || 0);
+    const conf     = confInfo(bet.confidence);
+    const isFire   = ev > 1.0;
+    const evClass  = ev >= 0 ? 'ev-positive' : 'ev-neutral';
+
+    // Pick label clean
+    const pick     = bet.pick || '—';
+    const market   = bet.market || '';
+    const matchStr = bet.match || `${bet.home_team || bet.home || '?'} vs ${bet.away_team || bet.away || '?'}`;
+
+    // Time
+    let timeStr = '';
+    const ct = bet.commence_time || bet.match_date || '';
+    if (ct) {
+      try {
+        const d = new Date(ct);
+        if (!isNaN(d)) timeStr = d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+      } catch {}
+    }
+
+    const betColor = isFire ? 'var(--red)' : (ev > 0.5 ? 'var(--green)' : 'var(--accent)');
+
+    return `
+      <div class="bet-card ${isFire ? 'fire-bet' : 'fade-in'}" style="--bet-color:${betColor}; animation-delay:${idx * 0.05}s; opacity:0">
+        <div class="bet-rank">${idx + 1}</div>
+        <div class="bet-main">
+          <div class="bet-match">${matchStr}</div>
+          <div class="bet-meta">
+            <span class="bet-tag tag-league" data-tip="${leagueName(bet.league)}">${bet.league || '—'}</span>
+            <span class="bet-tag tag-market">${mktLabel(market)}</span>
+            <span class="bet-tag ${pickClass(pick)}">${pickLabel(pick)}</span>
+            ${timeStr ? `<span class="bet-time">🕐 ${timeStr}</span>` : ''}
+            <span class="bet-tag ${conf.cls}" style="font-size:0.65rem">${conf.label}</span>
+          </div>
+          <div class="bet-meta" style="margin-top:4px">
+            <span style="font-size:0.7rem;color:var(--text3)">Model: ${(mp*100).toFixed(1)}% prob</span>
+            ${bet.notes ? `<span style="font-size:0.68rem;color:var(--text3);font-style:italic">${bet.notes.substring(0,50)}</span>` : ''}
+          </div>
+        </div>
+        <div class="bet-right">
+          <span class="bet-ev ${evClass}" data-tip="Expected Value">${fmtEV(ev)}</span>
+          <span class="bet-odds" data-tip="Decimal Odds">@${fmtOdds(odds)}</span>
+          <div class="bet-stars">${starsHtml(stars)}</div>
+        </div>
+      </div>`;
+  }
+
+  // ── Load card ──
+  async function loadCard() {
+    updateDateLabel();
+    document.getElementById('betsList').innerHTML = `
+      <div class="panel">
+        <div class="loading-overlay">
+          <div class="spinner"></div>
+          <div class="loading-text">Loading card for ${currentDate}…</div>
+        </div>
+      </div>`;
+    document.getElementById('betCountBadge').textContent = '…';
+
+    try {
+      const resp = await fetch(`${API}/card/${currentDate}`);
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({ detail: 'Server error' }));
+        showEmpty(err.detail || 'No card available');
+        updateStats(null);
+        return;
+      }
+      cardData = await resp.json();
+      renderCard(cardData);
+    } catch (e) {
+      showEmpty('Could not reach API — ' + e.message);
+      updateStats(null);
+    }
+  }
+
+  function showEmpty(msg) {
+    document.getElementById('betsList').innerHTML = `
+      <div class="panel fade-in">
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <div class="empty-title">No card available</div>
+          <div class="empty-sub">${msg}</div>
+        </div>
+      </div>`;
+    document.getElementById('betCountBadge').textContent = '0 bets';
+  }
+
+  function renderCard(data) {
+    const bets = data.bets || [];
+
+    // Sort by EV desc
+    bets.sort((a, b) => parseFloat(b.ev || 0) - parseFloat(a.ev || 0));
+
+    document.getElementById('betCountBadge').textContent = `${bets.length} bet${bets.length !== 1 ? 's' : ''}`;
+
+    if (bets.length === 0) {
+      showEmpty('Card generated but no value bets found today.');
+      updateStats(data);
+      renderSidebar(data, bets);
+      return;
+    }
+
+    document.getElementById('betsList').innerHTML = bets.map(renderBet).join('');
+    updateStats(data);
+    renderSidebar(data, bets);
+  }
+
+  function updateStats(data) {
+    const bets = data?.bets || [];
+    const evs  = bets.map(b => parseFloat(b.ev || 0)).filter(x => !isNaN(x));
+    const odds = bets.map(b => parseFloat(b.odds || b.book_odds || 0)).filter(x => x > 0);
+    const leagues = [...new Set(bets.map(b => b.league).filter(Boolean))];
+
+    document.getElementById('statBets').textContent      = bets.length || '—';
+    document.getElementById('statBetsSub').textContent   = data ? `${data.date} card` : 'No card';
+    document.getElementById('statBestEV').textContent    = evs.length ? fmtEV(Math.max(...evs)) : '—';
+    document.getElementById('statBestEVSub').textContent = evs.length ? `avg ${fmtEV(evs.reduce((a,b)=>a+b,0)/evs.length)}` : '—';
+    document.getElementById('statAvgOdds').textContent   = odds.length ? (odds.reduce((a,b)=>a+b,0)/odds.length).toFixed(2) : '—';
+    document.getElementById('statLeagues').textContent   = leagues.length || '—';
+    document.getElementById('statLeaguesSub').textContent = leagues.slice(0,4).join(', ') || '—';
+  }
+
+  function renderSidebar(data, bets) {
+    // ── Markets breakdown ──
+    const markets = {};
+    bets.forEach(b => {
+      const m = mktLabel(b.market || '—');
+      markets[m] = (markets[m] || 0) + 1;
+    });
+    const total = bets.length || 1;
+    const sortedM = Object.entries(markets).sort((a,b) => b[1]-a[1]);
+
+    document.getElementById('marketsPanel').innerHTML = sortedM.length ? sortedM.map(([m, n]) => `
+      <div class="market-bar">
+        <div class="market-bar-header">
+          <span class="market-name">${m}</span>
+          <span class="market-pct">${n} (${Math.round(n/total*100)}%)</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:0" data-width="${Math.round(n/total*100)}%"></div>
+        </div>
+      </div>`).join('') :
+      '<div style="color:var(--text3);font-size:.78rem;text-align:center;padding:.5rem 0">—</div>';
+
+    // Animate bars
+    setTimeout(() => {
+      document.querySelectorAll('.bar-fill[data-width]').forEach(el => {
+        el.style.width = el.dataset.width;
+      });
+    }, 100);
+
+    // ── Leagues breakdown ──
+    const leagues = {};
+    bets.forEach(b => { if (b.league) leagues[b.league] = (leagues[b.league] || 0) + 1; });
+    const sortedL = Object.entries(leagues).sort((a,b) => b[1]-a[1]);
+
+    document.getElementById('leaguesPanel').innerHTML = sortedL.length ? sortedL.map(([code, n]) => `
+      <div class="league-item">
+        <div style="display:flex;align-items:center;flex:1">
+          <span class="league-flag">${leagueFlag(code)}</span>
+          <span class="league-name">${leagueName(code)}</span>
+        </div>
+        <span class="league-count">${n} bet${n>1?'s':''}</span>
+      </div>`).join('') :
+      '<div style="color:var(--text3);font-size:.78rem;text-align:center;padding:.5rem 0">—</div>';
+  }
+
+  // ── Load performance ──
+  async function loadPerf() {
+    try {
+      const resp = await fetch(`${API}/performance?days=30`);
+      if (!resp.ok) { renderPerfEmpty(); return; }
+      const p = await resp.json();
+
+      const items = [
+        ['Bets (30d)',  p.n_bets ?? '—', 'neutral'],
+        ['Won',         p.n_settled ?? '—', 'neutral'],
+        ['Win Rate',    p.win_rate != null ? (p.win_rate * 100).toFixed(1) + '%' : '—', p.win_rate >= 0.5 ? 'positive' : 'negative'],
+        ['ROI',         p.roi != null ? (p.roi * 100).toFixed(2) + '%' : '—', p.roi >= 0 ? 'positive' : 'negative'],
+        ['Total P&L',   p.total_pnl != null ? (p.total_pnl >= 0 ? '+' : '') + p.total_pnl.toFixed(2) + 'u' : '—', p.total_pnl >= 0 ? 'positive' : 'negative'],
+        ['Avg CLV',     p.avg_clv != null ? p.avg_clv.toFixed(4) : 'N/A', p.avg_clv > 0 ? 'positive' : 'neutral'],
+      ];
+
+      document.getElementById('perfPanel').innerHTML = items.map(([label, val, cls]) => `
+        <div class="perf-stat">
+          <span class="perf-label">${label}</span>
+          <span class="perf-value ${cls}">${val}</span>
+        </div>`).join('');
+    } catch { renderPerfEmpty(); }
+  }
+
+  function renderPerfEmpty() {
+    document.getElementById('perfPanel').innerHTML = `
+      <div class="perf-stat">
+        <span class="perf-label">Status</span>
+        <span class="perf-value neutral">No history yet</span>
+      </div>
+      <div style="color:var(--text3);font-size:.72rem;margin-top:.5rem;line-height:1.5">
+        Performance stats appear after bets are settled.
+      </div>`;
+  }
+
+  // ── Load system status ──
+  async function loadStatus() {
+    try {
+      const resp = await fetch(`${API}/status`);
+      if (!resp.ok) { renderStatusErr(); return; }
+      const s = await resp.json();
+
+      const items = [
+        ['API',     'v' + (s.api_version || '1.0.0'), 'status-ok'],
+        ['DB',      s.db_exists !== false ? 'Connected' : 'Missing', s.db_exists !== false ? 'status-ok' : 'status-warn'],
+        ['Cards',   s.total_cards ?? 0, 'neutral'],
+        ['Bets',    s.total_bets ?? 0, 'neutral'],
+        ['Settled', s.settled_bets ?? 0, 'neutral'],
+        ['Last',    s.last_card || 'None', 'neutral'],
+      ];
+
+      document.getElementById('systemPanel').innerHTML = items.map(([k, v, cls]) => `
+        <div class="status-item">
+          <span class="status-key">${k}</span>
+          <span class="status-val ${cls}">${v}</span>
+        </div>`).join('');
+
+      // Update header badge
+      const badge = document.getElementById('systemStatus');
+      badge.querySelector('span').textContent = s.uptime === 'ok' ? 'Live' : 'Degraded';
+    } catch { renderStatusErr(); }
+  }
+
+  function renderStatusErr() {
+    document.getElementById('systemPanel').innerHTML = `
+      <div class="status-item">
+        <span class="status-key">API</span>
+        <span class="status-val status-warn">Unreachable</span>
+      </div>`;
+    document.getElementById('systemStatus').querySelector('span').textContent = 'Error';
+    document.getElementById('systemStatus').style.background = 'rgba(239,68,68,0.1)';
+    document.getElementById('systemStatus').style.borderColor = 'rgba(239,68,68,0.25)';
+    document.getElementById('systemStatus').style.color = 'var(--red2)';
+  }
+
+  // ── Refresh ──
+  async function refreshCard() {
+    const btn = document.getElementById('refreshBtn');
+    btn.classList.add('spinning');
+    await Promise.all([loadCard(), loadPerf(), loadStatus()]);
+    btn.classList.remove('spinning');
+    showToast('Card refreshed ✓');
+  }
+
+  // ── Init ──
+  (async () => {
+    updateDateLabel();
+    await Promise.all([loadCard(), loadPerf(), loadStatus()]);
+  })();
+
+  // Auto-refresh every 60s
+  setInterval(() => {
+    loadCard();
+    loadStatus();
+  }, 60_000);
+</script>
+</body>
+</html>

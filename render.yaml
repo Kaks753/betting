@@ -6,11 +6,15 @@
 #   - Model cache in /tmp/kbet_data — survives within the same machine uptime
 #   - First run: ~5 min (fits Dixon-Coles model, saves to /tmp)
 #   - Repeat runs: ~15 sec (loads from cache)
-#   - DB at /opt/render/project/src/kbet/data/kbet.db (resets on redeploy)
+#   - DB is stored inside the container at /app/kbet/data/kbet.db
+#     → resets on redeploy; use paid disk for persistence
 #   - Use Fly.io (free, 3GB persistent) if you need history across redeploys
 #
 # PAID PLAN ($7/month disk):
 #   - Uncomment disk block + change DATA_DIR=/data for full persistence
+#
+# On startup: the API auto-generates today's card in the background.
+# Visit / for the dashboard UI.
 
 services:
   - type: web

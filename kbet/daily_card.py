@@ -1044,23 +1044,40 @@ def print_card(bets: List[Bet], target_date: str) -> None:
 
 
 def save_card(bets: List[Bet], target_date: str) -> Path:
-    """Save bet card to JSON."""
+    """Save bet card to JSON (DATA_DIR and static repo dir as fallback)."""
     out_path = OUTPUT_DIR / f"card_{target_date.replace('-','')}.json"
+    actionable = [asdict(b) for b in bets if b.ev > 0]
+    advisory   = [asdict(b) for b in bets if b.ev == 0]
+
     data = {
-        "date": target_date,
-        "generated_at": datetime.now(timezone.utc).isoformat(),
-        "total_bets": len(bets),
-        "actionable": [asdict(b) for b in bets if b.ev > 0],
-        "advisory": [asdict(b) for b in bets if b.ev == 0],
-        "config": CARD_CONFIG,
+        "date":          target_date,
+        "generated_at":  datetime.now(timezone.utc).isoformat(),
+        "total_bets":    len(bets),
+        "actionable":    actionable,
+        "advisory":      advisory,
+        # Also include flat "bets" key so API can read it directly
+        "bets":          actionable,
+        "config":        CARD_CONFIG,
     }
     # Remove internal score attribute
-    for cat in ["actionable", "advisory"]:
+    for cat in ["actionable", "advisory", "bets"]:
         for item in data[cat]:
             item.pop("_score", None)
 
     with open(out_path, "w") as f:
         json.dump(data, f, indent=2, default=str)
+
+    # Also save to static repo path so it survives container restarts (fallback)
+    static_dir = Path(__file__).parent / "data" / "daily_cards"
+    static_dir.mkdir(parents=True, exist_ok=True)
+    static_path = static_dir / f"card_{target_date.replace('-','')}.json"
+    if static_path != out_path:
+        try:
+            with open(static_path, "w") as f:
+                json.dump(data, f, indent=2, default=str)
+        except Exception:
+            pass  # Non-fatal; DATA_DIR copy is the primary
+
     return out_path
 
 

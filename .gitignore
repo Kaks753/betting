@@ -16,3 +16,10 @@ nohup.out
 kbet/data/raw/
 # all_matches.parquet IS committed (883KB — needed by Render/Docker deploys)
 # kbet/data/processed/*.parquet
+
+# DB and model cache — large files, regenerated at runtime
+kbet/data/kbet.db
+kbet/data/model_cache/*.pkl
+
+# Daily card JSONs (auto-generated) — we keep these committed as fallback
+# kbet/data/daily_cards/
