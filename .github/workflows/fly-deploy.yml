@@ -1,0 +1,23 @@
+name: Deploy to Fly.io
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:   # Allow manual trigger from GitHub Actions tab
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    concurrency: deploy-group    # Only one deploy at a time
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io
+        run: flyctl deploy --remote-only --app kbet-api
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
