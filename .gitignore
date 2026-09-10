@@ -14,4 +14,5 @@ nohup.out
 *.swp
 *.swo
 kbet/data/raw/
-kbet/data/processed/*.parquet
+# all_matches.parquet IS committed (883KB — needed by Render/Docker deploys)
+# kbet/data/processed/*.parquet

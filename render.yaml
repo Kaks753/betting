@@ -1,53 +1,51 @@
 # Render.com deployment config
-# Deploy from GitHub: https://render.com → New Web Service → Connect repo
+# Live at: https://kbet-7fyx.onrender.com
 #
 # FREE PLAN NOTES:
 #   - No persistent disk on free plan (paid: $7/month for 1GB disk)
-#   - Model cache in /tmp survives within same machine session only
-#   - With model caching: first run ~5min (fits+saves), repeat runs ~15sec
-#   - DB resets on redeploy (bets history lost) — use Fly.io if history is critical
+#   - Model cache in /tmp/kbet_data — survives within the same machine uptime
+#   - First run: ~5 min (fits Dixon-Coles model, saves to /tmp)
+#   - Repeat runs: ~15 sec (loads from cache)
+#   - DB at /opt/render/project/src/kbet/data/kbet.db (resets on redeploy)
+#   - Use Fly.io (free, 3GB persistent) if you need history across redeploys
 #
 # PAID PLAN ($7/month disk):
-#   - Add disk block below and set DATA_DIR=/data for full persistence
+#   - Uncomment disk block + change DATA_DIR=/data for full persistence
 
 services:
   - type: web
     name: kbet-api
-    runtime: python
+    runtime: docker           # Use Dockerfile for consistent Python 3.11 env
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn kbet.api.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /status  # Render polls this — returns 200 OK
     envVars:
       - key: ODDS_API_KEY
-        sync: false        # Set in Render dashboard → Environment → ODDS_API_KEY
+        sync: false           # Set in Render Dashboard → Environment
       - key: ADMIN_TOKEN
-        sync: false        # Set a secret value in dashboard
+        sync: false           # Set in Render Dashboard → Environment
       - key: BANKROLL
         value: "1000"
       - key: MAX_BETS
         value: "10"
-      - key: PYTHONPATH
-        value: "/opt/render/project/src"
       - key: DATA_DIR
-        value: "/tmp/kbet_data"   # Ephemeral on free plan; change to /data with paid disk
-      # Uncomment below for paid plan with persistent disk ($7/month):
+        value: "/tmp/kbet_data"   # In-process cache; change to /data with paid disk
+      # For paid disk ($7/month), uncomment:
       # - key: DATA_DIR
       #   value: "/data"
 
-  # Uncomment to add 1GB persistent disk (paid plan only, $7/month):
+  # Uncomment for 1GB persistent disk (paid plan, $7/month):
   # disk:
   #   name: kbet-data
   #   mountPath: /data
   #   sizeGB: 1
 
 cron:
-  # Daily card at 10:00 UTC — triggers cron_runner.py
+  # Daily card generation at 10:00 UTC
   - name: kbet-daily-cron
-    runtime: python
+    runtime: docker
     plan: free
     schedule: "0 10 * * *"
-    buildCommand: pip install -r requirements.txt
-    startCommand: python3 kbet/cron_runner.py --card-only
+    dockerCommand: python3 kbet/cron_runner.py --card-only
     envVars:
       - key: ODDS_API_KEY
         sync: false
@@ -55,7 +53,5 @@ cron:
         sync: false
       - key: BANKROLL
         value: "1000"
-      - key: PYTHONPATH
-        value: "/opt/render/project/src"
       - key: DATA_DIR
         value: "/tmp/kbet_data"

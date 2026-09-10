@@ -79,6 +79,7 @@ def require_admin(x_admin_token: str = Header(default="")):
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
 @app.get("/", tags=["health"])
+@app.head("/", tags=["health"])   # Render health checks use HEAD /
 async def health() -> Dict:
     """Health check and system info."""
     db_exists = DB_PATH.exists()
