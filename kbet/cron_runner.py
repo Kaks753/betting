@@ -96,22 +96,39 @@ def generate_card(
         # Normalise to dict format expected downstream
         card = {
             "date": target_date,
-            "total_exposure": sum(getattr(b, "stake_pct", 0.0) for b in bets),
+            "total_exposure": sum(getattr(b, "stake_pct", getattr(b, "confidence", 0.0)) for b in bets),
             "bets": [
                 {
-                    "match_id":   getattr(b, "match_id", ""),
-                    "home":       getattr(b, "home", ""),
-                    "away":       getattr(b, "away", ""),
-                    "league":     getattr(b, "league", ""),
-                    "match_date": getattr(b, "match_date", target_date),
-                    "market":     getattr(b, "market", ""),
-                    "pick":       getattr(b, "pick", ""),
-                    "model_prob": getattr(b, "model_prob", 0.0),
-                    "book_odds":  getattr(b, "book_odds", 0.0),
-                    "ev":         getattr(b, "ev", 0.0),
-                    "stake_pct":  getattr(b, "stake_pct", 0.0),
+                    # Bet dataclass fields (from daily_card.py):
+                    #   match, league, market, pick, odds, bookmaker,
+                    #   model_prob, implied_prob, ev, confidence (float 0-1),
+                    #   stars, clv_proxy, weather_tag, home_team, away_team, commence_time
+                    "match_id":    getattr(b, "match_id", ""),
+                    "home_team":   getattr(b, "home_team", getattr(b, "home", "")),
+                    "away_team":   getattr(b, "away_team", getattr(b, "away", "")),
+                    "home":        getattr(b, "home_team", getattr(b, "home", "")),
+                    "away":        getattr(b, "away_team", getattr(b, "away", "")),
+                    "match":       getattr(b, "match", ""),
+                    "league":      getattr(b, "league", ""),
+                    "match_date":  getattr(b, "match_date", getattr(b, "commence_time", target_date)),
+                    "commence_time": getattr(b, "commence_time", ""),
+                    "market":      getattr(b, "market", ""),
+                    "pick":        getattr(b, "pick", ""),
+                    "model_prob":  getattr(b, "model_prob", 0.0),
+                    "book_odds":   getattr(b, "book_odds", getattr(b, "odds", 0.0)),
+                    "odds":        getattr(b, "odds", 0.0),
+                    "bookmaker":   getattr(b, "bookmaker", ""),
+                    "ev":          getattr(b, "ev", 0.0),
+                    "ev_pct":      getattr(b, "ev_pct", ""),
+                    "confidence":  getattr(b, "confidence", 0.0),
+                    "stars":       getattr(b, "stars", 0),
+                    "clv_proxy":   getattr(b, "clv_proxy", 0.0),
+                    "stake_pct":   getattr(b, "stake_pct", 0.0),
                     "stake_units": getattr(b, "stake_units", 0.0),
-                    "confidence": getattr(b, "confidence", "WATCH"),
+                    "weather_tag": getattr(b, "weather_tag", "DRY"),
+                    "notes":       getattr(b, "notes", ""),
+                    "eff_odds":    getattr(b, "eff_odds", getattr(b, "odds", 0.0)),
+                    "entry_prob":  getattr(b, "entry_prob", getattr(b, "model_prob", 0.0)),
                 }
                 for b in bets
             ],
@@ -150,22 +167,23 @@ def persist_card(
     n_saved = 0
     for bet in bets:
         try:
+            book_odds = float(bet.get("book_odds") or bet.get("odds") or 0)
             db.save_bet(
                 card_id=card_id,
-                match_date=bet.get("match_date", target_date),
+                match_date=bet.get("match_date") or bet.get("commence_time") or target_date,
                 league=bet.get("league", ""),
-                home_team=bet.get("home_team", ""),
-                away_team=bet.get("away_team", ""),
+                home_team=bet.get("home_team") or bet.get("home") or "",
+                away_team=bet.get("away_team") or bet.get("away") or "",
                 market=bet.get("market", ""),
                 pick=bet.get("pick", ""),
-                model_prob=float(bet.get("model_prob", 0)),
-                book_odds=float(bet.get("book_odds", 0)),
-                eff_odds=float(bet.get("eff_odds", bet.get("book_odds", 0))),
-                stake_pct=float(bet.get("stake_pct", 0)),
-                stake_units=float(bet.get("stake_units", 0)),
-                ev=float(bet.get("ev", 0)),
-                confidence=bet.get("confidence", "WATCH"),
-                entry_prob=float(bet.get("entry_prob", 0)),
+                model_prob=float(bet.get("model_prob") or 0),
+                book_odds=book_odds,
+                eff_odds=float(bet.get("eff_odds") or book_odds),
+                stake_pct=float(bet.get("stake_pct") or 0),
+                stake_units=float(bet.get("stake_units") or 0),
+                ev=float(bet.get("ev") or 0),
+                confidence=str(bet.get("confidence") or "WATCH"),
+                entry_prob=float(bet.get("entry_prob") or bet.get("model_prob") or 0),
             )
             n_saved += 1
         except Exception as e:
