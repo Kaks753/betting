@@ -83,12 +83,14 @@ CARD_CONFIG = {
     # EV thresholds (post-slippage) — wise rebalanced for 1x2 diversity
     "1x2_ev_thresh":       0.025,  # 2.5% (down from 3% → more 1x2)
     "ou_ev_thresh":        0.04,   # 4% for O/U
+    "btts_ev_thresh":      0.05,   # 5% for BTTS
     "corners_ev_thresh":   0.04,
     "cards_ev_thresh":     0.05,
 
     # Confidence filters
     "1x2_min_prob":        0.25,
     "ou_min_prob":         0.35,
+    "btts_min_prob":       0.35,
     "corners_min_prob":    0.40,
     "cards_min_prob":      0.40,
 
@@ -523,6 +525,13 @@ class DailyCardEngine:
                         all_bets.append(b)
                         bets_per_match[match_key] += 1
             if bets_per_match[match_key] < CARD_CONFIG["max_bets_per_match"]:
+                for b in self._eval_btts(models, match, home_id, away_id, weather_tag, weather):
+                    if bets_per_match[match_key] < CARD_CONFIG["max_bets_per_match"]:
+                        b.commence_time = b.commence_time or f"{date_str} 00:00:00"
+                        b.match_date = date_str
+                        all_bets.append(b)
+                        bets_per_match[match_key] += 1
+            if bets_per_match[match_key] < CARD_CONFIG["max_bets_per_match"]:
                 for b in self._eval_corners(models, match, home_id, away_id, weather_tag, weather):
                     if bets_per_match[match_key] < CARD_CONFIG["max_bets_per_match"]:
                         b.commence_time = b.commence_time or f"{date_str} 00:00:00"
@@ -733,6 +742,60 @@ class DailyCardEngine:
         except Exception as e:
             logger.warning(f"O/U Goals eval failed: {e}")
 
+        return sorted(bets, key=lambda b: b.ev, reverse=True)[:1]
+
+    def _eval_btts(
+        self, models: ModelSet, match: MatchOdds,
+        home_id, away_id, weather_tag, weather
+    ) -> List[Bet]:
+        """Evaluate BTTS Yes/No market."""
+        bets = []
+        try:
+            btts_pred = models.dc.predict_btts(home_id, away_id)
+            if btts_pred is None:
+                return []
+            best_btts = match.best_btts()
+            if best_btts is None:
+                return []
+            # Try Pinnacle devig as reference? For now use best price devig
+            for side, prob, odds in [
+                ("yes", btts_pred["yes"], best_btts.yes),
+                ("no",  btts_pred["no"],  best_btts.no),
+            ]:
+                if prob < CARD_CONFIG["btts_min_prob"]:
+                    continue
+                if odds is None or odds <= 1.01 or odds > 15.0:
+                    continue
+                ev = ((prob * odds) - 1.0) * (1 - CARD_CONFIG["slippage"])
+                if ev < CARD_CONFIG["btts_ev_thresh"]:
+                    continue
+                if ev > 0.20:
+                    logger.warning(f"[EV REJECT] BTTS {match.home_team} v {match.away_team} {side}: EV={ev:.1%} >20%")
+                    continue
+                if ev > 0.12:
+                    logger.info(f"[EV WARN] BTTS {match.home_team} v {match.away_team} {side}: EV={ev:.1%}")
+                confidence = self._confidence_score(ev=ev, prob=prob, pin_gap=0.0, weather_tag=weather_tag, model_fitted=True, market="btts")
+                bets.append(Bet(
+                    match=f"{match.home_team} vs {match.away_team}",
+                    league=match.league_code,
+                    market="BTTS",
+                    pick="Yes" if side=="yes" else "No",
+                    odds=round(odds,2),
+                    bookmaker=best_btts.bookmaker,
+                    model_prob=round(prob,4),
+                    implied_prob=round(1/odds,4),
+                    ev=round(ev,4),
+                    confidence=round(confidence,3),
+                    stars=self._stars(confidence),
+                    clv_proxy=0.0,
+                    weather_tag=weather_tag,
+                    notes=f"BTTS {side}={prob:.3f}",
+                    commence_time=match.commence_time,
+                    home_team=match.home_team,
+                    away_team=match.away_team,
+                ))
+        except Exception as e:
+            logger.warning(f"BTTS eval failed: {e}")
         return sorted(bets, key=lambda b: b.ev, reverse=True)[:1]
 
     def _eval_corners(

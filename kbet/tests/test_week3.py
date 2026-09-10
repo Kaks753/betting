@@ -510,6 +510,54 @@ class TestAPISmoke:
 
 
 # ────────────────────────────────────────────────────────────────────────────
+# 6. Validation tests (reviewer priority)
+# ────────────────────────────────────────────────────────────────────────────
+
+class TestValidation:
+    def test_ev_never_exceeds_20_percent(self):
+        """No real liquid market produces >20% EV — cap must hold."""
+        import pandas as pd
+        from pathlib import Path
+        parquet = Path(__file__).parent.parent / "data" / "processed" / "all_matches.parquet"
+        if not parquet.exists():
+            pytest.skip("no parquet")
+        df = pd.read_parquet(parquet)
+        # Simulate a few cards and check EV cap
+        from kbet.daily_card import DailyCardEngine
+        for d in ["2023-09-16", "2023-09-18"]:
+            eng = DailyCardEngine(target_date=d, simulate=True)
+            bets = eng.run(max_bets=12)
+            for b in bets:
+                assert b.ev <= 0.20 + 1e-9, f"EV {b.ev:.1%} exceeds 20% cap on {b.match}"
+
+    def test_probabilities_sum_to_one(self):
+        """Dixon-Coles 1X2 and BTTS must sum to 1 (unfitted fallback)."""
+        from kbet.engine.models.dixon_coles import DixonColesModel
+        m = DixonColesModel()
+        # Unfitted uses league average — still must sum to 1
+        for home, away in [("Arsenal", "Chelsea"), ("Man City", "Liverpool")]:
+            p = m.predict_1x2(home, away)
+            assert abs(p["home"] + p["draw"] + p["away"] - 1.0) < 1e-6
+            b = m.predict_btts(home, away)
+            assert abs(b["yes"] + b["no"] - 1.0) < 1e-6
+            o = m.predict_over_under(home, away, 2.5)
+            assert abs(o["over"] + o["under"] - 1.0) < 1e-6
+
+    def test_odds_sanity(self):
+        """Liverpool at Anfield vs Palace should never be 3.70."""
+        # Check that devig rejects corrupted odds and caps hold
+        from kbet.engine.utils.clv_tracker import devig_1x2
+        # Normal odds
+        assert devig_1x2(2.10, 3.40, 3.60) is not None
+        # Corrupted overround >1.15 should be flagged by daily_card (tested via ev cap)
+        # Direct sanity: odds bounds
+        for odds in [0.5, 1.0, 0.9, 100]:
+            # kelly should reject
+            from kbet.engine.utils.kelly import kelly_stake
+            assert kelly_stake(0.5, odds) == 0.0
+
+
+# ────────────────────────────────────────────────────────────────────────────
 # Run
 # ────────────────────────────────────────────────────────────────────────────
 

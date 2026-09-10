@@ -73,6 +73,15 @@ class OddsH2H:
 
 
 @dataclass
+class OddsBTTS:
+    """Both Teams To Score odds from a single bookmaker."""
+    bookmaker: str
+    yes: float
+    no: float
+    last_update: str = ""
+
+
+@dataclass
 class OddsTotals:
     """Over/Under total goals odds from a single bookmaker."""
     bookmaker: str
@@ -93,6 +102,7 @@ class MatchOdds:
     commence_time: str        # ISO-8601 UTC
     h2h: List[OddsH2H] = field(default_factory=list)
     totals: List[OddsTotals] = field(default_factory=list)
+    btts: List[OddsBTTS] = field(default_factory=list)
     snapshot_time: str = ""   # When this snapshot was taken
 
     # --- Derived helpers ------------------------------------------------
@@ -159,6 +169,26 @@ class MatchOdds:
             return None
         inv = 1/pin.over + 1/pin.under
         return (1/pin.over)/inv, (1/pin.under)/inv
+
+    def best_btts(self) -> Optional[OddsBTTS]:
+        if not self.btts:
+            return None
+        best_yes = max(self.btts, key=lambda o: o.yes)
+        best_no = max(self.btts, key=lambda o: o.no)
+        return OddsBTTS(bookmaker="MAX", yes=best_yes.yes, no=best_no.no)
+
+    def pinnacle_btts(self) -> Optional[OddsBTTS]:
+        for o in self.btts:
+            if o.bookmaker == "pinnacle":
+                return o
+        return None
+
+    def devig_pinnacle_btts(self) -> Optional[Tuple[float, float]]:
+        pin = self.pinnacle_btts()
+        if pin is None:
+            return None
+        inv = 1/pin.yes + 1/pin.no
+        return (1/pin.yes)/inv, (1/pin.no)/inv
 
 
 # ---------------------------------------------------------------------------
@@ -231,7 +261,7 @@ class OddsAPIClient:
         ----------
         leagues : list of football-data.co.uk league codes, e.g. ["E0","SP1"]
                   If None, fetches all 10 supported leagues.
-        markets : ["h2h", "totals"] by default
+        markets : ["h2h", "totals", "btts"] by default (btts needs paid plan, falls back gracefully)
         regions : bookmaker regions (eu recommended for Pinnacle coverage)
         use_cache : serve from disk cache if < 15 minutes old
 
@@ -244,7 +274,7 @@ class OddsAPIClient:
                 "ODDS_API_KEY not set. Export it or pass api_key= to OddsAPIClient()."
             )
         if markets is None:
-            markets = ["h2h", "totals"]
+            markets = ["h2h", "totals", "btts"]
 
         sport_keys = [
             LEAGUE_TO_SPORT_KEY[lc]
@@ -292,7 +322,7 @@ class OddsAPIClient:
         if not self.api_key:
             raise OddsAPIKeyMissingError("API key required for historical snapshots.")
         if markets is None:
-            markets = ["h2h", "totals"]
+            markets = ["h2h", "totals", "btts"]
 
         sport_keys = [
             LEAGUE_TO_SPORT_KEY[lc]
@@ -444,16 +474,24 @@ class OddsAPIClient:
                         if h and d and a:
                             m.h2h.append(OddsH2H(bk_name, h, d, a, last_upd))
                     elif mkt["key"] == "totals":
+                        over_price = under_price = None
+                        line = 2.5
                         for o in mkt.get("outcomes", []):
                             if o["name"] == "Over":
                                 over_price = o["price"]
                                 line = o.get("point", 2.5)
                             elif o["name"] == "Under":
                                 under_price = o["price"]
-                        if "over_price" in dir() and "under_price" in dir():
+                        if over_price and under_price:
                             m.totals.append(
                                 OddsTotals(bk_name, line, over_price, under_price, last_upd)
                             )
+                    elif mkt["key"] == "btts":
+                        o_map = {o["name"]: o["price"] for o in mkt.get("outcomes", [])}
+                        y = o_map.get("Yes")
+                        n = o_map.get("No")
+                        if y and n:
+                            m.btts.append(OddsBTTS(bk_name, y, n, last_upd))
             matches.append(m)
         return matches
 
