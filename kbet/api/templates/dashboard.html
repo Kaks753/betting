@@ -892,6 +892,18 @@
   </div>
 </main>
 
+<footer style="max-width:1400px;margin:2rem auto 0;padding:1.5rem 2rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center;color:var(--text3);font-size:0.72rem;line-height:1.6">
+  <div>
+    <strong style="color:var(--text2)">KBet Analytics</strong> — We don't gamble. We exploit market inefficiencies.<br>
+    Model: Dixon-Coles + ELO calibration. No bet is risk-free. Past performance is not indicative of future results. 18+ Gamble Responsibly.
+    <a href="https://www.begambleaware.org" target="_blank" rel="noopener" style="color:var(--accent2);text-decoration:none"> BeGambleAware.org</a>
+  </div>
+  <div style="display:flex;gap:0.75rem;align-items:center">
+    <span id="ledgerHash" style="font-family:JetBrains Mono,monospace;font-size:0.65rem;background:var(--bg3);border:1px solid var(--border);padding:4px 8px;border-radius:6px">hash: —</span>
+    <a href="/docs" style="color:var(--text3);text-decoration:none;border:1px solid var(--border);padding:4px 10px;border-radius:6px">API Docs</a>
+  </div>
+</footer>
+
 <!-- Toast -->
 <div id="toast"></div>
 
@@ -1320,8 +1332,14 @@
     document.getElementById('betsList').innerHTML = demoBanner + bets.map(renderBet).join('');
     updateStats(data);
     renderSidebar(data, bets);
+    renderCardPostProcess(data);
   }
 
+  function renderCardPostProcess(data){
+    const h = data.ledger_hash || '';
+    const el = document.getElementById('ledgerHash');
+    if (el) { el.textContent = h ? 'hash: ' + h.slice(0,12) + '…' : 'hash: —'; if(h) el.title = h; }
+  }
   function updateStats(data) {
     var bets    = (data && data.bets) ? data.bets : [];
     var evs     = bets.map(function(b){ return parseFloat(b.ev||0); }).filter(function(x){ return !isNaN(x) && x !== 0; });
@@ -1475,6 +1493,19 @@
       if (resp.ok) { showToast('Cron started pid=' + data.pid + ' — refresh in 30s', 4000); startPolling(); }
       else showToast('Admin error: ' + (data.detail||resp.status), 5000);
     } catch(e){ showToast('Admin request failed', 4000); }
+  }
+
+  // ── Ledger hash display ──
+  async function updateLedgerHash(dateStr) {
+    try {
+      const r = await fetch('/card/' + dateStr);
+      if (!r.ok) return;
+      const d = await r.json();
+      const h = d.ledger_hash || d.hash || '';
+      const el = document.getElementById('ledgerHash');
+      if (el) el.textContent = h ? 'hash: ' + h.slice(0,12) + '…' : 'hash: —';
+      if (h) el.title = h;
+    } catch(e){}
   }
 
   // ── Refresh button ──

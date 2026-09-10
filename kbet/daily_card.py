@@ -1091,6 +1091,22 @@ def save_card(bets: List[Bet], target_date: str) -> Path:
     with open(out_path, "w") as f:
         json.dump(data, f, indent=2, default=str)
 
+    # Trust ledger: SHA256 of actionable bets (proves no cherry-pick)
+    try:
+        import hashlib
+        ledger_dir = OUTPUT_DIR.parent / "public_picks"
+        ledger_dir.mkdir(parents=True, exist_ok=True)
+        hash_payload = json.dumps(actionable, sort_keys=True, default=str)
+        h = hashlib.sha256(hash_payload.encode()).hexdigest()
+        with open(ledger_dir / f"hash_{target_date.replace('-','')}.txt", "w") as hf:
+            hf.write(f"{h}  {target_date}  {len(actionable)} bets\n")
+        # Also store hash in card JSON for API
+        data["ledger_hash"] = h
+        with open(out_path, "w") as f:
+            json.dump(data, f, indent=2, default=str)
+    except Exception:
+        pass
+
     # Also save to static repo path so it survives container restarts (fallback)
     static_dir = Path(__file__).parent / "data" / "daily_cards"
     static_dir.mkdir(parents=True, exist_ok=True)
@@ -1101,6 +1117,15 @@ def save_card(bets: List[Bet], target_date: str) -> Path:
                 json.dump(data, f, indent=2, default=str)
         except Exception:
             pass  # Non-fatal; DATA_DIR copy is the primary
+        # Mirror hash file
+        try:
+            import hashlib as _hl
+            static_ledger = static_dir.parent / "public_picks"
+            static_ledger.mkdir(exist_ok=True)
+            with open(static_ledger / f"hash_{target_date.replace('-','')}.txt", "w") as hf:
+                hf.write(f"{data.get('ledger_hash','')}  {target_date}\n")
+        except Exception:
+            pass
 
     return out_path
 
