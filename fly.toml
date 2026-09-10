@@ -19,7 +19,8 @@ primary_region = "iad"   # Washington DC — change to closest: lhr=London, cdg=
 
 [env]
   PYTHONPATH    = "/app"
-  DB_PATH       = "/data/kbet.db"    # ← Persistent volume mount — survives ALL redeploys
+  DB_PATH       = "/data/kbet.db"    # ← Persistent volume — survives ALL redeploys
+  DATA_DIR      = "/data"            # ← Model cache + card JSONs on persistent volume
   BANKROLL      = "1000"
   MAX_BETS      = "10"
   PORT          = "8080"
@@ -37,7 +38,7 @@ primary_region = "iad"   # Washington DC — change to closest: lhr=London, cdg=
     soft_limit = 20
 
 [[vm]]
-  memory = "256mb"
+  memory = "512mb"
   cpu_kind = "shared"
   cpus = 1
 

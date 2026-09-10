@@ -279,6 +279,50 @@ async def run_cron(
     }
 
 
+@app.get("/admin/cron-status", tags=["admin"])
+async def cron_status(
+    target_date: Optional[str] = Query(default=None),
+    _: bool = Depends(require_admin),
+) -> Dict:
+    """
+    Check background cron progress for a given date.
+    Returns log tail + whether card is ready in DB.
+    """
+    date_str = target_date or date.today().strftime("%Y-%m-%d")
+    log_path = Path(__file__).parent.parent / "logs" / f"cron_{date_str}.log"
+
+    log_tail = ""
+    if log_path.exists():
+        with open(log_path, "r") as f:
+            lines = f.readlines()
+            log_tail = "".join(lines[-30:])  # last 30 lines
+
+    # Check if card is ready
+    db = get_db()
+    summary = db.get_daily_summary(date_str)
+    card_ready = summary is not None
+    n_bets = summary.get("n_bets", 0) if summary else 0
+
+    # Check model cache
+    data_dir = Path(os.environ.get("DATA_DIR", str(Path(__file__).parent.parent / "data")))
+    cache_dir = data_dir / "model_cache"
+    cache_files = list(cache_dir.glob("modelset_*.pkl")) if cache_dir.exists() else []
+    cache_info = []
+    for cf in sorted(cache_files)[-3:]:  # last 3 cache files
+        age_h = (datetime.now().timestamp() - cf.stat().st_mtime) / 3600
+        cache_info.append({"file": cf.name, "age_hours": round(age_h, 1), "size_mb": round(cf.stat().st_size / 1e6, 1)})
+
+    return {
+        "date":        date_str,
+        "card_ready":  card_ready,
+        "n_bets":      n_bets,
+        "model_cache": cache_info,
+        "log_path":    str(log_path),
+        "log_exists":  log_path.exists(),
+        "log_tail":    log_tail,
+    }
+
+
 @app.get("/status", tags=["health"])
 async def status(db: Database = Depends(get_db)) -> Dict:
     """Extended status with DB stats."""

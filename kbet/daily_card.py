@@ -64,8 +64,15 @@ from kbet.engine.utils.entity_resolver import EntityRegistry as EntityResolver
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger("daily_card")
 
-DATA_PATH   = Path(__file__).parent / "data/processed/all_matches.parquet"
-OUTPUT_DIR  = Path(__file__).parent / "data/daily_cards"
+# ---------------------------------------------------------------------------
+# Persistent storage paths
+# On Fly.io / Render with a mounted volume: set DATA_DIR=/data
+# Locally defaults to kbet/data (relative to this file)
+# ---------------------------------------------------------------------------
+_DATA_DIR = Path(os.environ.get("DATA_DIR", str(Path(__file__).parent / "data")))
+
+DATA_PATH   = Path(__file__).parent / "data/processed/all_matches.parquet"  # source data (static)
+OUTPUT_DIR  = _DATA_DIR / "daily_cards"     # card JSONs → persistent volume
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # ---------------------------------------------------------------------------
@@ -161,7 +168,9 @@ LEAGUE_NAMES = {
 # Model trainer
 # ---------------------------------------------------------------------------
 
-MODEL_CACHE_DIR = Path(__file__).parent / "data/model_cache"
+# Model cache lives on the persistent volume so it survives redeploys.
+# First run: ~3-5 min to fit Dixon-Coles.  Every subsequent run: ~15 sec.
+MODEL_CACHE_DIR = _DATA_DIR / "model_cache"
 MODEL_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 

@@ -1,7 +1,15 @@
 # Render.com deployment config
 # Deploy from GitHub: https://render.com → New Web Service → Connect repo
-# Note: Persistent disk requires a paid plan. Free plan uses ephemeral storage.
-# SQLite data resets on redeploy on free plan — acceptable for analytics.
+#
+# FREE PLAN NOTES:
+#   - No persistent disk on free plan (paid: $7/month for 1GB disk)
+#   - Model cache in /tmp survives within same machine session only
+#   - With model caching: first run ~5min (fits+saves), repeat runs ~15sec
+#   - DB resets on redeploy (bets history lost) — use Fly.io if history is critical
+#
+# PAID PLAN ($7/month disk):
+#   - Add disk block below and set DATA_DIR=/data for full persistence
+
 services:
   - type: web
     name: kbet-api
@@ -11,7 +19,7 @@ services:
     startCommand: uvicorn kbet.api.app:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: ODDS_API_KEY
-        sync: false        # Set this in Render dashboard after getting from the-odds-api.com
+        sync: false        # Set in Render dashboard → Environment → ODDS_API_KEY
       - key: ADMIN_TOKEN
         sync: false        # Set a secret value in dashboard
       - key: BANKROLL
@@ -20,15 +28,34 @@ services:
         value: "10"
       - key: PYTHONPATH
         value: "/opt/render/project/src"
+      - key: DATA_DIR
+        value: "/tmp/kbet_data"   # Ephemeral on free plan; change to /data with paid disk
+      # Uncomment below for paid plan with persistent disk ($7/month):
+      # - key: DATA_DIR
+      #   value: "/data"
+
+  # Uncomment to add 1GB persistent disk (paid plan only, $7/month):
+  # disk:
+  #   name: kbet-data
+  #   mountPath: /data
+  #   sizeGB: 1
 
 cron:
-  # Daily card at 10:00 UTC
+  # Daily card at 10:00 UTC — triggers cron_runner.py
   - name: kbet-daily-cron
     runtime: python
     plan: free
     schedule: "0 10 * * *"
     buildCommand: pip install -r requirements.txt
-    startCommand: python3 kbet/cron_runner.py
+    startCommand: python3 kbet/cron_runner.py --card-only
     envVars:
       - key: ODDS_API_KEY
         sync: false
+      - key: ADMIN_TOKEN
+        sync: false
+      - key: BANKROLL
+        value: "1000"
+      - key: PYTHONPATH
+        value: "/opt/render/project/src"
+      - key: DATA_DIR
+        value: "/tmp/kbet_data"
