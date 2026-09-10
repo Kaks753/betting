@@ -299,8 +299,15 @@ class Database:
               AND match_date >= date('now', '-{} days')
         """.format(days)).fetchall()
 
+        # Fallback for demo: if no bets in window but we have historic settled bets, show all-time
         if not rows:
-            return {"n_bets": 0, "roi": 0.0, "avg_clv": None}
+            rows = conn.execute("""
+                SELECT result, pnl, clv, market, stake_units
+                FROM bets
+                WHERE settled_at IS NOT NULL
+            """).fetchall()
+            if not rows:
+                return {"n_bets": 0, "roi": 0.0, "avg_clv": None}
 
         pnls  = [r["pnl"]  for r in rows if r["pnl"]  is not None]
         clvs  = [r["clv"]  for r in rows if r["clv"]  is not None]

@@ -143,7 +143,8 @@ class Bet:
 
     @property
     def star_str(self) -> str:
-        return "★" * self.stars + "☆" * (5 - self.stars)
+        # ASCII-safe for Windows cp1252 consoles
+        return "*" * self.stars + "-" * (5 - self.stars)
 
     @property
     def ev_pct(self) -> str:
@@ -198,7 +199,7 @@ class ModelSet:
             self.corners     = cached["corners"]
             self.cards       = cached["cards"]
             self.df          = cached["df"]
-            print(f"  ⚡ Loaded models from cache ({cache_key}) — skipping refit")
+            print(f"  [CACHE] Loaded models from cache ({cache_key}) — skipping refit")
             print(f"     DC: {self.dc.n_matches} matches, {len(self.dc.teams)} teams")
             return
 
@@ -214,21 +215,21 @@ class ModelSet:
               f"window={self.TRAINING_WINDOW_DAYS}d, {len(dc_df):,} matches)...")
         self.dc = DixonColesModel()
         self.dc.fit(dc_df, as_of_date)
-        print(f"        DC: {self.dc.n_matches} matches, {len(self.dc.teams)} teams  ✓")
+        print(f"        DC: {self.dc.n_matches} matches, {len(self.dc.teams)} teams  OK")
 
         print("  [2/4] Isotonic calibrators...")
         self.calibrators = self._fit_calibrators(dc_df, as_of_date)
-        print(f"        Calibrators: {list(self.calibrators.keys()) if self.calibrators else 'None'}  ✓")
+        print(f"        Calibrators: {list(self.calibrators.keys()) if self.calibrators else 'None'}  OK")
 
         print("  [3/4] Corners model...")
         self.corners = CornersModel(decay_xi=0.006)
         self.corners.fit(dc_df, as_of_date)
-        print(f"        Corners: {self.corners.n_matches} matches, fitted={self.corners.fitted}  ✓")
+        print(f"        Corners: {self.corners.n_matches} matches, fitted={self.corners.fitted}  OK")
 
         print("  [4/4] Cards model...")
         self.cards = CardsModel(decay_xi=0.005)
         self.cards.fit(dc_df, as_of_date)
-        print(f"        Cards: {self.cards.n_matches} matches, fitted={self.cards.fitted}  ✓")
+        print(f"        Cards: {self.cards.n_matches} matches, fitted={self.cards.fitted}  OK")
 
         # Persist to cache
         self._save_cache(cache_key)
@@ -320,7 +321,7 @@ class ModelSet:
         try:
             with open(p, "wb") as f:
                 pickle.dump(payload, f, protocol=4)
-            print(f"  💾 Model cache saved → {p.name}")
+            print(f"  [CACHE] Model cache saved -> {p.name}")
         except Exception as e:
             print(f"  Cache save failed: {e}")
 
@@ -402,17 +403,28 @@ class DailyCardEngine:
         matches = self._get_matches()
 
         if not matches:
-            print("  ⚠️  No matches found for this date.")
+            print("  [WARN] No matches found for this date.")
             return []
 
         print(f"  Found {len(matches)} matches")
 
-        # Fetch weather for all matches
-        weather_inputs = [
-            (m.home_team, m.league_code, self.target_date)
-            for m in matches
-        ]
-        weather_map = self.weather.get_bulk_conditions(weather_inputs)
+        # Fetch weather for all matches — skip external calls for historical dates (>7 days old) or simulate fallback
+        skip_external = False
+        try:
+            is_historic = (pd.Timestamp(self.target_date) < pd.Timestamp.now() - pd.Timedelta(days=7))
+            if is_historic or self.simulate or os.environ.get("KBET_SKIP_EXTERNAL") == "1":
+                skip_external = True
+        except Exception:
+            pass
+        if skip_external:
+            weather_map = {}
+            print(f"  [HISTORIC] Skipping weather/ClubElo API (historic date)")
+        else:
+            weather_inputs = [
+                (m.home_team, m.league_code, self.target_date)
+                for m in matches
+            ]
+            weather_map = self.weather.get_bulk_conditions(weather_inputs)
 
         # Evaluate all bets
         print(f"\n  Evaluating {len(matches)} matches across all markets...")
@@ -427,10 +439,13 @@ class DailyCardEngine:
             weather = weather_map.get(weather_key)
             weather_tag = weather.weather_tag if weather else "DRY"
 
-            # Get ClubElo priors
-            elo_h, elo_a = self.clubelo.get_elo_pair(
-                match.home_team, match.away_team, self.target_date
-            )
+            # Get ClubElo priors (skip for historic to avoid 502 storm)
+            if skip_external:
+                elo_h, elo_a = None, None
+            else:
+                elo_h, elo_a = self.clubelo.get_elo_pair(
+                    match.home_team, match.away_team, self.target_date
+                )
 
             # Map team names to internal IDs
             home_id = self.resolver.resolve(match.home_team)
@@ -843,16 +858,16 @@ class DailyCardEngine:
             return self._simulate_matches_from_history()
 
         if not self.api_key:
-            print("  ⚠️  No ODDS_API_KEY — switching to historical simulation mode")
+            print("  [WARN] No ODDS_API_KEY — switching to historical simulation mode")
             return self._simulate_matches_from_history()
 
         try:
             return self.odds_client.get_today_odds(leagues=self.leagues)
         except OddsAPIKeyMissingError:
-            print("  ⚠️  Invalid API key — switching to simulation mode")
+            print("  [WARN] Invalid API key — switching to simulation mode")
             return self._simulate_matches_from_history()
         except Exception as e:
-            print(f"  ⚠️  API fetch failed ({e}) — switching to simulation mode")
+            print(f"  [WARN] API fetch failed ({e}) — switching to simulation mode")
             return self._simulate_matches_from_history()
 
     def _simulate_matches_from_history(self) -> List[MatchOdds]:
@@ -874,6 +889,15 @@ class DailyCardEngine:
                 (self.all_df["date"] >= target - pd.Timedelta(days=1)) &
                 (self.all_df["date"] <= target + pd.Timedelta(days=2))
             ]
+
+        if len(window_df) == 0:
+            # No matches for this date — fallback to most recent matchday (for demo/today when parquet is historic)
+            latest_date = self.all_df["date"].max()
+            window_df = self.all_df[self.all_df["date"] == latest_date].copy()
+            # Re-label commence_time to target_date so card appears as today
+            if len(window_df) > 0:
+                window_df["date"] = target
+                print(f"  [FALLBACK] No matches for {self.target_date} — using latest available {latest_date.date()} ({len(window_df)} matches) labeled as today")
 
         if len(window_df) == 0:
             return []
@@ -1002,17 +1026,17 @@ def print_card(bets: List[Bet], target_date: str) -> None:
     actionable = [b for b in bets if b.ev > 0]
     advisory   = [b for b in bets if b.ev == 0]
 
-    print(f"\n{'═'*72}")
-    print(f"  📋 KBet Daily Card — {target_date}  ({len(bets)} recommendations)")
-    print(f"{'═'*72}")
+    print(f"\n{'='*72}")
+    print(f"  KBet Daily Card - {target_date}  ({len(bets)} recommendations)")
+    print(f"{'='*72}")
 
     if actionable:
-        print(f"\n  ✅ ACTIONABLE BETS ({len(actionable)}) — odds confirmed, EV computed\n")
+        print(f"\n  ACTIONABLE BETS ({len(actionable)}) — odds confirmed, EV computed\n")
         print(f"  {'#':>2}  {'Match':<28} {'Market':<16} {'Pick':>4}  {'Odds':>5}  {'EV':>6}  {'Stars':<6}")
-        print(f"  {'─'*70}")
+        print(f"  {'-'*70}")
         for i, b in enumerate(actionable, 1):
-            weather_icon = "🌧" if b.weather_tag in ("HEAVY_RAIN","LIGHT_RAIN") else (
-                           "💨" if b.weather_tag == "WINDY" else "")
+            weather_icon = "[R]" if b.weather_tag in ("HEAVY_RAIN","LIGHT_RAIN") else (
+                           "[W]" if b.weather_tag == "WINDY" else "")
             print(
                 f"  {i:>2}  {b.match:<28} {b.market:<16} "
                 f"{b.pick:>4}  {b.odds:>5.2f}  {b.ev_pct:>6}  {b.star_str} {weather_icon}"
@@ -1021,26 +1045,26 @@ def print_card(bets: List[Bet], target_date: str) -> None:
                   f"Model: {b.model_prob:.3f} | Implied: {b.implied_prob:.3f} | "
                   f"Book: {b.bookmaker}")
             if b.notes:
-                print(f"       📝 {b.notes}")
+                print(f"       NOTE: {b.notes}")
             print()
 
     if advisory:
-        print(f"\n  🔎 ADVISORY BETS ({len(advisory)}) — model flag raised, CHECK ODDS\n")
+        print(f"\n  ADVISORY BETS ({len(advisory)}) — model flag raised, CHECK ODDS\n")
         print(f"  {'#':>2}  {'Match':<28} {'Market':<16} {'Pick':>4}  {'Prob':>6}  {'Stars':<6}")
-        print(f"  {'─'*65}")
+        print(f"  {'-'*65}")
         for i, b in enumerate(advisory, 1):
             print(
                 f"  {i:>2}  {b.match:<28} {b.market:<16} "
                 f"{b.pick:>4}  {b.model_prob:>6.3f}  {b.star_str}"
             )
             if b.notes:
-                print(f"       📝 {b.notes}")
+                print(f"       NOTE: {b.notes}")
             print()
 
-    print(f"{'─'*72}")
-    print(f"  ⚠️  All EV figures include 20% slippage. Max stake: 1-2% bankroll per bet.")
-    print(f"  📊 Corners/Cards marked 'OBTAIN ODDS' require live odds verification.")
-    print(f"{'═'*72}\n")
+    print(f"{'-'*72}")
+    print(f"  NOTE: All EV figures include 20% slippage. Max stake: 1-2% bankroll per bet.")
+    print(f"  Corners/Cards marked 'OBTAIN ODDS' require live odds verification.")
+    print(f"{'='*72}\n")
 
 
 def save_card(bets: List[Bet], target_date: str) -> Path:
@@ -1127,7 +1151,7 @@ def main():
 
     if not args.no_save and bets:
         out_path = save_card(bets, engine.target_date)
-        print(f"  💾 Saved → {out_path}\n")
+        print(f"  Saved -> {out_path}\n")
 
 
 if __name__ == "__main__":

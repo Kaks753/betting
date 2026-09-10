@@ -168,6 +168,28 @@ def persist_card(
     for bet in bets:
         try:
             book_odds = float(bet.get("book_odds") or bet.get("odds") or 0)
+            # Compute Kelly stake if not supplied (Bet dataclass has no stake field)
+            stake_pct = float(bet.get("stake_pct") or 0)
+            stake_units = float(bet.get("stake_units") or 0)
+            if stake_pct == 0 and stake_units == 0 and book_odds > 1:
+                try:
+                    from kbet.engine.utils.kelly import kelly_stake
+                    mp = float(bet.get("model_prob") or 0)
+                    # Use post-slippage odds as in daily_card (0.20 slippage)
+                    eff_odds_tmp = book_odds * 0.8
+                    ks = kelly_stake(mp, eff_odds_tmp)
+                    if ks > 0:
+                        stake_pct = ks
+                        stake_units = round(ks * 100, 4)
+                    else:
+                        stake_pct = 0.01
+                        stake_units = 1.0
+                except Exception:
+                    stake_pct = 0.01
+                    stake_units = 1.0
+            if stake_pct == 0 and stake_units == 0:
+                stake_pct = 0.01
+                stake_units = 1.0
             db.save_bet(
                 card_id=card_id,
                 match_date=bet.get("match_date") or bet.get("commence_time") or target_date,
@@ -178,9 +200,9 @@ def persist_card(
                 pick=bet.get("pick", ""),
                 model_prob=float(bet.get("model_prob") or 0),
                 book_odds=book_odds,
-                eff_odds=float(bet.get("eff_odds") or book_odds),
-                stake_pct=float(bet.get("stake_pct") or 0),
-                stake_units=float(bet.get("stake_units") or 0),
+                eff_odds=float(bet.get("eff_odds") or book_odds * 0.8),
+                stake_pct=stake_pct,
+                stake_units=stake_units,
                 ev=float(bet.get("ev") or 0),
                 confidence=str(bet.get("confidence") or "WATCH"),
                 entry_prob=float(bet.get("entry_prob") or bet.get("model_prob") or 0),
@@ -233,16 +255,34 @@ def _settle_from_parquet(db: Database, before_date: str) -> Dict:
 
     settled = failed = 0
     for bet in unsettled:
-        match_date = bet["match_date"]
+        # match_date may be "2023-09-16" or "2023-09-16 00:00:00" or ISO — extract date part
+        raw_date = str(bet["match_date"] or "")[:10]
+        match_date = raw_date
         home = bet["home_team"].strip().lower()
         away = bet["away_team"].strip().lower()
 
-        # Find match in parquet
+        # Find match in parquet — try exact then loose prefix match
         matches = df[
             (df["date_str"] == match_date) &
             (df["home_team"].str.strip().str.lower() == home) &
             (df["away_team"].str.strip().str.lower() == away)
         ]
+        if matches.empty:
+            # Loose fallback: first 6 chars prefix (handles "Man City" vs "Manchester City")
+            import re
+            def norm(s): return re.sub(r"[^a-z0-9]", "", s.lower())
+            nh, na = norm(home), norm(away)
+            mask = (df["date_str"] == match_date)
+            # Filter by substring match
+            candidates = df[mask]
+            for _, cand in candidates.iterrows():
+                ch = norm(str(cand["home_team"]))
+                ca = norm(str(cand["away_team"]))
+                if (nh[:6] in ch or ch[:6] in nh) and (na[:6] in ca or ca[:6] in na):
+                    matches = candidates[(candidates["home_team"].str.lower().str.contains(home[:4], na=False))].head(1)
+                    # Use the single candidate
+                    matches = pd.DataFrame([cand])
+                    break
 
         if matches.empty:
             log.debug(f"  No match: {bet['home_team']} v {bet['away_team']} {match_date}")
@@ -255,22 +295,34 @@ def _settle_from_parquet(db: Database, before_date: str) -> Dict:
         away_goals = row.get("away_goals", 0) or 0
         total_goals = home_goals + away_goals
 
-        # Determine win/loss
-        pick = bet["pick"]
-        market = bet["market"]
+        # Determine win/loss — handle both canonical and display market names
+        pick = str(bet["pick"] or "").strip()
+        market = str(bet["market"] or "").strip().lower()
         won = False
+        is_1x2 = market in ("1x2", "1x2", "1X2".lower())
+        is_ou = "o/u" in market or market == "ou" or "over/under" in market
 
-        if market == "1x2":
+        if is_1x2:
             won = pick == actual_result
-        elif market == "ou":
-            if pick == "O2.5":
+        elif is_ou:
+            # picks: Over/Under, O2.5/U2.5, O/U variants
+            p_low = pick.lower()
+            if p_low in ("over", "o", "o2.5", "over 2.5"):
                 won = total_goals > 2.5
-            elif pick == "U2.5":
+            elif p_low in ("under", "u", "u2.5", "under 2.5"):
                 won = total_goals <= 2.5
+        else:
+            # Unknown market — mark as void, don't count as loss
+            log.debug(f"  Unknown market {bet['market']} for {bet['home_team']} v {bet['away_team']} — skip")
+            failed += 1
+            continue
 
         result_code = "W" if won else "L"
-        eff_odds = bet["eff_odds"] or bet["book_odds"]
-        stake_units = bet["stake_units"]
+        eff_odds = bet["eff_odds"] or bet["book_odds"] or 1.0
+        stake_units = bet["stake_units"] or 1.0
+        # Clamp stake_units — DB may have 0 if card was saved before Kelly sizing
+        if stake_units == 0:
+            stake_units = 1.0
         pnl = stake_units * (eff_odds - 1) if won else -stake_units
 
         db.settle_bet(
