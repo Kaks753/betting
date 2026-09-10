@@ -273,6 +273,9 @@ async def get_latest_card(db: Database = Depends(get_db)) -> Dict:
                         "bankroll_start":  1000.0,
                         "settled_summary": {"total": 0, "won": 0, "lost": 0, "pending": 0, "total_pnl": 0, "avg_clv": None},
                         "bets":            normed,
+                        "horizon":         data.get("horizon", 1),
+                        "horizon_dates":   data.get("horizon_dates", [run_date]),
+                        "ledger_hash":     data.get("ledger_hash", ""),
                         "demo_mode":       True,
                         "demo_note":       "Sample card (historical backtest — live card requires ODDS_API_KEY)",
                     }
@@ -361,6 +364,27 @@ async def get_card_by_date(
         n_bets_val = int(summary.get("n_bets", len(card_bets)))
     except Exception:
         n_bets_val = len(card_bets)
+    # Try to enrich with horizon/ledger_hash from JSON file if present
+    horizon = 1
+    horizon_dates = [run_date]
+    ledger_hash = ""
+    try:
+        j = _load_card_from_json(run_date)
+        if j:
+            raw = json.loads(j.get("card_json","[]")) if isinstance(j.get("card_json"), str) else j.get("card_json",[])
+            # j is summary dict from JSON file load, not DB summary — need direct file read
+            pass
+        # Direct file read for horizon
+        for d in [Path(os.environ.get("DATA_DIR", str(Path(__file__).parent.parent / "data"))) / "daily_cards" / f"card_{run_date.replace('-','')}.json", Path(__file__).parent.parent / "data" / "daily_cards" / f"card_{run_date.replace('-','')}.json"]:
+            if d.exists():
+                with open(d) as f:
+                    jd=json.load(f)
+                horizon = jd.get("horizon", 1)
+                horizon_dates = jd.get("horizon_dates", [run_date])
+                ledger_hash = jd.get("ledger_hash", "")
+                break
+    except Exception:
+        pass
     return {
         "date":            run_date,
         "generated_at":    summary.get("generated_at", ""),
@@ -371,6 +395,9 @@ async def get_card_by_date(
         "bankroll_start":  summary.get("bankroll_start", 1000),
         "settled_summary": settled_summary,
         "bets":            card_bets,
+        "horizon":         horizon,
+        "horizon_dates":   horizon_dates,
+        "ledger_hash":     ledger_hash,
     }
 
 

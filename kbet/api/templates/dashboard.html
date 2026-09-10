@@ -1301,7 +1301,7 @@
     var isDemoMode = data.demo_mode === true;
     var today = new Date().toISOString().split('T')[0];
 
-    // Demo banner: shown when viewing a sample/latest card because today has no data
+    // Demo / horizon banner
     var demoBanner = '';
     if (isDemoMode) {
       demoBanner = '<div style="'
@@ -1316,7 +1316,13 @@
         + '</span></div></div>';
       document.getElementById('betCountBadge').textContent = bets.length + ' sample bets';
     } else {
-      document.getElementById('betCountBadge').textContent = bets.length + ' bet' + (bets.length !== 1 ? 's' : '');
+      var horizon = data.horizon || 1;
+      var extra = horizon > 1 ? ' · ' + horizon + '-day pool (' + (data.horizon_dates||[]).join(' + ') + ')' : '';
+      document.getElementById('betCountBadge').textContent = bets.length + ' bet' + (bets.length !== 1 ? 's' : '') + extra;
+      if (horizon > 1) {
+        demoBanner = '<div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:8px 12px;margin-bottom:12px;font-size:0.78rem;color:var(--accent2);">'
+          + '🔀 Thin day — merged best across ' + horizon + ' days: ' + esc((data.horizon_dates||[]).join(' + ')) + '</div>';
+      }
     }
 
     if (bets.length === 0) {

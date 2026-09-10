@@ -80,29 +80,30 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 # ---------------------------------------------------------------------------
 
 CARD_CONFIG = {
-    # EV thresholds (post-slippage)
-    "1x2_ev_thresh":       0.03,   # 3% min EV for 1X2 bets
-    "ou_ev_thresh":        0.04,   # 4% min EV for O/U goals
-    "corners_ev_thresh":   0.04,   # 4% min EV for corners
-    "cards_ev_thresh":     0.05,   # 5% min EV for cards
+    # EV thresholds (post-slippage) — wise rebalanced for 1x2 diversity
+    "1x2_ev_thresh":       0.025,  # 2.5% (down from 3% → more 1x2)
+    "ou_ev_thresh":        0.04,   # 4% for O/U
+    "corners_ev_thresh":   0.04,
+    "cards_ev_thresh":     0.05,
 
     # Confidence filters
-    "1x2_min_prob":        0.25,   # Minimum model probability for 1X2 side
+    "1x2_min_prob":        0.25,
     "ou_min_prob":         0.35,
     "corners_min_prob":    0.40,
     "cards_min_prob":      0.40,
 
     # Pinnacle gap: blended prob must beat Pinnacle de-vig by this margin
-    "1x2_vs_pin_gap":      0.015,
+    "1x2_vs_pin_gap":      0.012,  # down from 0.015 → +30% more 1x2
 
     # DC / Pinnacle blend weight
     "blend_dc_weight":     0.20,   # 20% DC, 80% Pinnacle
 
-    # Risk controls
+    # Risk controls — adaptive min_bets 3-5 (thin day 3 if avg EV>0.10 else 5)
     "slippage":            0.20,
     "max_bets":            12,
-    "min_bets":            5,
+    "min_bets":            5,      # base; overridden dynamically in _rank_and_select
     "max_bets_per_match":  2,      # Max 2 markets bet on same game (correlation)
+    "max_bets_per_team":   2,      # Max 2 times same team appears across card (kill Bayern twice)
     "min_odds":            1.40,   # No value in massive favourites
     "max_odds":            5.00,   # No lottery shots
 
@@ -140,6 +141,7 @@ class Bet:
     commence_time: str = ""
     home_team:   str = ""
     away_team:   str = ""
+    match_date:  str = ""    # YYYY-MM-DD for settlement / horizon
 
     @property
     def star_str(self) -> str:
@@ -389,112 +391,152 @@ class DailyCardEngine:
         self.odds_client = OddsAPIClient(api_key=self.api_key)
 
     def run(self, max_bets: int = None) -> List[Bet]:
-        """Main pipeline: fetch odds → evaluate → rank → return card."""
+        """Main pipeline: fetch odds → evaluate → rank → return card. Adaptive 2-day merge if thin."""
         max_bets = max_bets or CARD_CONFIG["max_bets"]
 
         # Training cutoff: use all data before target_date
         as_of = pd.Timestamp(self.target_date)
 
-        # Fit models
+        # Fit models once
         models = ModelSet(as_of, self.all_df)
+        self._horizon = 1
+        self._horizon_dates = [self.target_date]
 
-        # Fetch matches with odds
-        print(f"\n  Fetching match odds for {self.target_date}...")
-        matches = self._get_matches()
-
-        if not matches:
-            print("  [WARN] No matches found for this date.")
+        all_bets = self._evaluate_date(self.target_date, models)
+        if not all_bets:
+            # If no matches (empty), still return empty (fallback handled by caller)
             return []
 
-        print(f"  Found {len(matches)} matches")
+        # Adaptive merge: if thin day (<5 actionable or avg EV <0.08), pull next day
+        actionable = [b for b in all_bets if b.ev > 0]
+        avg_ev = sum(b.ev for b in actionable) / len(actionable) if actionable else 0
+        need_merge = len(actionable) < 5 or (actionable and avg_ev < 0.08)
+        # Also merge if total matches <8 (very thin Monday)
+        # Check original matches count via _last_matches cache
+        if hasattr(self, '_last_match_count') and self._last_match_count < 8:
+            need_merge = True
 
-        # Fetch weather for all matches — skip external calls for historical dates (>7 days old) or simulate fallback
+        if need_merge:
+            next_date = (pd.Timestamp(self.target_date) + pd.Timedelta(days=1)).strftime("%Y-%m-%d")
+            # Don't merge if next_date beyond historical data max (both would fallback to same historic set)
+            parquet_max = self.all_df["date"].max()
+            if pd.Timestamp(next_date) > parquet_max + pd.Timedelta(days=2):
+                print(f"  [ADAPTIVE] Thin but next day {next_date} beyond data max {parquet_max.date()} -> skip merge")
+            else:
+                print(f"  [ADAPTIVE] Thin day ({len(actionable)} bets, avg EV {avg_ev:.1%}, matches {getattr(self,'_last_match_count', '?')}) -> merging {next_date}")
+                # Temporarily switch target for fetch
+                orig_target = self.target_date
+                self.target_date = next_date
+                more_bets = self._evaluate_date(next_date, models)
+                self.target_date = orig_target
+                if more_bets:
+                    # Tag extra bets with their true date for settlement
+                    for b in more_bets:
+                        if not b.commence_time or b.commence_time[:10] == orig_target:
+                            b.commence_time = f"{next_date} {b.commence_time[11:] if len(b.commence_time)>10 else '00:00:00'}"
+                            b.match_date = next_date
+                    all_bets = all_bets + more_bets
+                    self._horizon = 2
+                    self._horizon_dates = [orig_target, next_date]
+                    print(f"  [ADAPTIVE] Merged -> {len(all_bets)} total bets across 2 days")
+            # else: keep single day
+        # If we didn't merge via above else, need to ensure more_bets not referenced
+        if 'more_bets' not in locals():
+            more_bets = []
+            if more_bets:
+                # Tag extra bets with their true date for settlement
+                for b in more_bets:
+                    if not b.commence_time or b.commence_time[:10] == orig_target:
+                        b.commence_time = f"{next_date} {b.commence_time[11:] if len(b.commence_time)>10 else '00:00:00'}"
+                        b.match_date = next_date
+                all_bets = all_bets + more_bets
+                self._horizon = 2
+                self._horizon_dates = [orig_target, next_date]
+                print(f"  [ADAPTIVE] Merged -> {len(all_bets)} total bets across 2 days")
+
+        # Rank and filter (with team collision guard)
+        final_card = self._rank_and_select(all_bets, max_bets)
+        # Trim to adaptive min_bets 3-5 logic: if avg EV high, allow 3
+        if len(final_card) >= 3 and len(final_card) < 5 and avg_ev > 0.10:
+            pass  # keep 3
+        return final_card
+
+    def _evaluate_date(self, date_str: str, models: "ModelSet") -> List[Bet]:
+        """Evaluate all bets for a single date — extracted for adaptive merge."""
+        # Fetch matches for this date (override target temporarily if needed)
+        orig = self.target_date
+        need_switch = date_str != orig
+        if need_switch:
+            self.target_date = date_str
+        matches = self._get_matches()
+        if need_switch:
+            self.target_date = orig
+        if not matches:
+            print(f"  [WARN] No matches found for {date_str}.")
+            return []
+        self._last_match_count = len(matches)
+        print(f"\n  Fetching match odds for {date_str}... Found {len(matches)} matches")
+
+        # Weather skip logic
         skip_external = False
         try:
-            is_historic = (pd.Timestamp(self.target_date) < pd.Timestamp.now() - pd.Timedelta(days=7))
+            is_historic = (pd.Timestamp(date_str) < pd.Timestamp.now() - pd.Timedelta(days=7))
             if is_historic or self.simulate or os.environ.get("KBET_SKIP_EXTERNAL") == "1":
                 skip_external = True
         except Exception:
             pass
         if skip_external:
             weather_map = {}
-            print(f"  [HISTORIC] Skipping weather/ClubElo API (historic date)")
+            print(f"  [HISTORIC] Skipping weather/ClubElo API ({date_str})")
         else:
-            weather_inputs = [
-                (m.home_team, m.league_code, self.target_date)
-                for m in matches
-            ]
+            weather_inputs = [(m.home_team, m.league_code, date_str) for m in matches]
             weather_map = self.weather.get_bulk_conditions(weather_inputs)
 
-        # Evaluate all bets
-        print(f"\n  Evaluating {len(matches)} matches across all markets...")
+        print(f"  Evaluating {len(matches)} matches for {date_str}...")
         all_bets: List[Bet] = []
         bets_per_match: Dict[str, int] = {}
-
         for match in matches:
             match_key = f"{match.home_team} vs {match.away_team}"
             bets_per_match.setdefault(match_key, 0)
-
-            weather_key = f"{match.home_team}_{self.target_date}"
+            weather_key = f"{match.home_team}_{date_str}"
             weather = weather_map.get(weather_key)
             weather_tag = weather.weather_tag if weather else "DRY"
-
-            # Get ClubElo priors (skip for historic to avoid 502 storm)
             if skip_external:
                 elo_h, elo_a = None, None
             else:
-                elo_h, elo_a = self.clubelo.get_elo_pair(
-                    match.home_team, match.away_team, self.target_date
-                )
-
-            # Map team names to internal IDs
+                elo_h, elo_a = self.clubelo.get_elo_pair(match.home_team, match.away_team, date_str)
             home_id = self.resolver.resolve(match.home_team)
             away_id = self.resolver.resolve(match.away_team)
-
-            # --- 1X2 evaluation ---
             if bets_per_match[match_key] < CARD_CONFIG["max_bets_per_match"]:
-                bets_1x2 = self._eval_1x2(
-                    models, match, home_id, away_id,
-                    elo_h, elo_a, weather_tag, weather
-                )
-                for b in bets_1x2:
+                for b in self._eval_1x2(models, match, home_id, away_id, elo_h, elo_a, weather_tag, weather):
                     if bets_per_match[match_key] < CARD_CONFIG["max_bets_per_match"]:
+                        # Tag date for settlement
+                        b.commence_time = b.commence_time or f"{date_str} 00:00:00"
+                        b.match_date = date_str
                         all_bets.append(b)
                         bets_per_match[match_key] += 1
-
-            # --- O/U Goals evaluation ---
             if bets_per_match[match_key] < CARD_CONFIG["max_bets_per_match"]:
-                bets_ou = self._eval_ou_goals(
-                    models, match, home_id, away_id, weather_tag, weather
-                )
-                for b in bets_ou:
+                for b in self._eval_ou_goals(models, match, home_id, away_id, weather_tag, weather):
                     if bets_per_match[match_key] < CARD_CONFIG["max_bets_per_match"]:
+                        b.commence_time = b.commence_time or f"{date_str} 00:00:00"
+                        b.match_date = date_str
                         all_bets.append(b)
                         bets_per_match[match_key] += 1
-
-            # --- Corners evaluation ---
             if bets_per_match[match_key] < CARD_CONFIG["max_bets_per_match"]:
-                bets_corn = self._eval_corners(
-                    models, match, home_id, away_id, weather_tag, weather
-                )
-                for b in bets_corn:
+                for b in self._eval_corners(models, match, home_id, away_id, weather_tag, weather):
                     if bets_per_match[match_key] < CARD_CONFIG["max_bets_per_match"]:
+                        b.commence_time = b.commence_time or f"{date_str} 00:00:00"
+                        b.match_date = date_str
                         all_bets.append(b)
                         bets_per_match[match_key] += 1
-
-            # --- Cards evaluation ---
             if bets_per_match[match_key] < CARD_CONFIG["max_bets_per_match"]:
-                bets_cards = self._eval_cards(
-                    models, match, home_id, away_id, weather_tag
-                )
-                for b in bets_cards:
+                for b in self._eval_cards(models, match, home_id, away_id, weather_tag):
                     if bets_per_match[match_key] < CARD_CONFIG["max_bets_per_match"]:
+                        b.commence_time = b.commence_time or f"{date_str} 00:00:00"
+                        b.match_date = date_str
                         all_bets.append(b)
                         bets_per_match[match_key] += 1
-
-        # Rank and filter
-        final_card = self._rank_and_select(all_bets, max_bets)
-        return final_card
+        return all_bets
 
     # -----------------------------------------------------------------------
     # Market evaluators
@@ -824,27 +866,49 @@ class DailyCardEngine:
 
         selected: List[Bet] = []
         match_counts: Dict[str, int] = {}
+        team_counts: Dict[str, int] = {}
+
+        def can_add(b: Bet) -> bool:
+            if match_counts.get(b.match, 0) >= CARD_CONFIG["max_bets_per_match"]:
+                return False
+            # Team collision guard: same team max 2 times across card (kill Bayern twice artifact)
+            ht = (b.home_team or b.match.split(" vs ")[0] if " vs " in b.match else "").strip().lower()
+            at = (b.away_team or b.match.split(" vs ")[-1] if " vs " in b.match else "").strip().lower()
+            if ht and team_counts.get(ht, 0) >= CARD_CONFIG.get("max_bets_per_team", 2):
+                return False
+            if at and team_counts.get(at, 0) >= CARD_CONFIG.get("max_bets_per_team", 2):
+                return False
+            return True
+
+        def add_bet(b: Bet):
+            selected.append(b)
+            match_counts[b.match] = match_counts.get(b.match, 0) + 1
+            ht = (b.home_team or b.match.split(" vs ")[0] if " vs " in b.match else "").strip().lower()
+            at = (b.away_team or b.match.split(" vs ")[-1] if " vs " in b.match else "").strip().lower()
+            if ht:
+                team_counts[ht] = team_counts.get(ht, 0) + 1
+            if at:
+                team_counts[at] = team_counts.get(at, 0) + 1
 
         # First pass: fill actionable bets
         for b in actionable:
             if len(selected) >= max_bets:
                 break
-            mc = match_counts.get(b.match, 0)
-            if mc >= CARD_CONFIG["max_bets_per_match"]:
+            if not can_add(b):
                 continue
-            selected.append(b)
-            match_counts[b.match] = mc + 1
+            add_bet(b)
 
         # Second pass: fill with advisory bets if below min
-        if len(selected) < CARD_CONFIG["min_bets"]:
+        # Adaptive min_bets 3-5: if avg EV high, allow 3
+        avg_ev = sum(b.ev for b in actionable) / len(actionable) if actionable else 0
+        dynamic_min = 3 if avg_ev > 0.10 else CARD_CONFIG["min_bets"]
+        if len(selected) < dynamic_min:
             for b in advisory:
                 if len(selected) >= max_bets:
                     break
-                mc = match_counts.get(b.match, 0)
-                if mc >= CARD_CONFIG["max_bets_per_match"]:
+                if not can_add(b):
                     continue
-                selected.append(b)
-                match_counts[b.match] = mc + 1
+                add_bet(b)
 
         return selected
 
@@ -1073,10 +1137,20 @@ def save_card(bets: List[Bet], target_date: str) -> Path:
     actionable = [asdict(b) for b in bets if b.ev > 0]
     advisory   = [asdict(b) for b in bets if b.ev == 0]
 
+    horizon_dates = sorted({b.get("match_date") or target_date for b in actionable if b.get("match_date")}) if actionable else [target_date]
+    # Fallback to Bet objects if dicts
+    try:
+        h2 = sorted({getattr(b, "match_date", "") or target_date for b in bets if getattr(b, "match_date", "")})
+        if h2:
+            horizon_dates = h2
+    except Exception:
+        pass
     data = {
         "date":          target_date,
         "generated_at":  datetime.now(timezone.utc).isoformat(),
         "total_bets":    len(bets),
+        "horizon":       len(horizon_dates),
+        "horizon_dates": horizon_dates,
         "actionable":    actionable,
         "advisory":      advisory,
         # Also include flat "bets" key so API can read it directly

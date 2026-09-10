@@ -65,7 +65,7 @@ log = logging.getLogger("cron")
 BANKROLL = float(os.environ.get("BANKROLL", "1000.0"))
 MAX_BETS = int(os.environ.get("MAX_BETS", "10"))
 MIN_BETS = int(os.environ.get("MIN_BETS", "5"))
-DEFAULT_LEAGUES = ["E0", "SP1", "D1", "I1", "F1"]
+DEFAULT_LEAGUES = ["E0", "E1", "SP1", "D1", "I1", "F1", "N1", "P1", "B1", "G1"]  # all 10 major — 10cr/day live, <500/mo free
 DEFAULT_MARKETS = ["1x2", "ou"]
 
 
