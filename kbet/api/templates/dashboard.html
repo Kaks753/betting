@@ -772,6 +772,7 @@
         <span>Live</span>
       </div>
       <div class="date-badge" id="headerDate">—</div>
+      <button class="refresh-btn" id="adminBtn" title="Admin: generate card" onclick="triggerAdminCron()">⚡</button>
       <button class="refresh-btn" id="refreshBtn" title="Refresh card" onclick="refreshCard()">↻</button>
     </div>
   </div>
@@ -1459,6 +1460,21 @@
     badge.style.background  = 'rgba(239,68,68,0.1)';
     badge.style.borderColor = 'rgba(239,68,68,0.25)';
     badge.style.color       = 'var(--red2)';
+  }
+
+  // ── Admin trigger ──
+  async function triggerAdminCron() {
+    const token = prompt('Admin token (ADMIN_TOKEN):');
+    if (!token) return;
+    const target = prompt('Date YYYY-MM-DD (leave blank for today):', currentDate);
+    const dateQ = target ? '?target_date=' + encodeURIComponent(target) + '&simulate=true&force=true' : '?simulate=true&force=true';
+    showToast('Triggering cron for ' + (target||'today') + ' ...', 2000);
+    try {
+      const resp = await fetch('/admin/run-cron' + dateQ, {method:'POST', headers:{'X-Admin-Token':token}});
+      const data = await resp.json().catch(()=>({detail: resp.statusText}));
+      if (resp.ok) { showToast('Cron started pid=' + data.pid + ' — refresh in 30s', 4000); startPolling(); }
+      else showToast('Admin error: ' + (data.detail||resp.status), 5000);
+    } catch(e){ showToast('Admin request failed', 4000); }
   }
 
   // ── Refresh button ──
