@@ -203,6 +203,55 @@ async def get_today_card(db: Database = Depends(get_db)) -> Dict:
     return await get_card_by_date(today, db)
 
 
+@app.get("/card/latest", tags=["card"])
+async def get_latest_card(db: Database = Depends(get_db)) -> Dict:
+    """Return the most recent card that has bets (for demo/sample display)."""
+    # Try DB first — find most recent card with n_bets > 0
+    try:
+        conn = db.connect()
+        row = conn.execute(
+            "SELECT run_date FROM daily_cards WHERE n_bets > 0 ORDER BY run_date DESC LIMIT 1"
+        ).fetchone()
+        if row:
+            card = await get_card_by_date(row[0], db)
+            card["demo_mode"] = True
+            card["demo_note"] = f"Sample card from {row[0]} (historical backtest)"
+            return card
+    except Exception:
+        pass
+
+    # Try JSON fallback files in repo
+    json_dir = Path(__file__).parent.parent / "data" / "daily_cards"
+    if json_dir.exists():
+        card_files = sorted(json_dir.glob("card_*.json"), reverse=True)
+        for cf in card_files:
+            try:
+                with open(cf) as f:
+                    data = json.load(f)
+                bets = data.get("bets") or data.get("actionable", [])
+                if len(bets) > 0:
+                    run_date = data.get("date", cf.stem.replace("card_", ""))
+                    if len(run_date) == 8 and "-" not in run_date:
+                        run_date = f"{run_date[:4]}-{run_date[4:6]}-{run_date[6:]}"
+                    return {
+                        "date":            run_date,
+                        "generated_at":    data.get("generated_at", ""),
+                        "n_bets":          len(bets),
+                        "leagues":         list({b.get("league", "") for b in bets if b.get("league")}),
+                        "markets":         list({b.get("market", "") for b in bets if b.get("market")}),
+                        "total_exposure":  data.get("total_exposure", 0),
+                        "bankroll_start":  1000.0,
+                        "settled_summary": {"total": 0, "won": 0, "lost": 0, "pending": 0, "total_pnl": 0, "avg_clv": None},
+                        "bets":            bets,
+                        "demo_mode":       True,
+                        "demo_note":       "Sample card (historical backtest — live card requires ODDS_API_KEY)",
+                    }
+            except Exception:
+                continue
+
+    raise HTTPException(status_code=404, detail="No cards with bets found.")
+
+
 @app.get("/card/{run_date}", tags=["card"])
 async def get_card_by_date(
     run_date: str,
