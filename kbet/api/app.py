@@ -244,12 +244,14 @@ async def get_bet(bet_id: int, db: Database = Depends(get_db)) -> Dict:
 async def run_cron(
     target_date: Optional[str] = Query(default=None),
     simulate:    bool          = Query(default=True),
+    force:       bool          = Query(default=False),
     _: bool = Depends(require_admin),
 ) -> Dict:
     """
     Manually trigger the cron runner in the background (admin only).
-    Returns immediately — card generation takes 3-5 minutes.
-    Check /card/{date} or /status after ~5 minutes to see results.
+    Returns immediately — card generation takes 3-5 minutes (15s after first run).
+    Check /card/{date} or /admin/cron-status after ~5 minutes to see results.
+    Use force=true to regenerate if card already exists for the date.
     Requires X-Admin-Token header.
     """
     import subprocess
@@ -258,6 +260,8 @@ async def run_cron(
            "--date", date_str, "--card-only"]
     if simulate:
         cmd.append("--simulate")
+    if force:
+        cmd.append("--force")
 
     # Launch as background process — don't wait for it (model fitting takes 3-5min)
     log_path = Path(__file__).parent.parent / "logs" / f"cron_{date_str}.log"
@@ -281,7 +285,8 @@ async def run_cron(
         "pid":      proc.pid,
         "date":     date_str,
         "simulate": simulate,
-        "message":  "Card generation started in background. Check /card/{date} in ~5 minutes.",
+        "force":    force,
+        "message":  "Card generation started in background. Check /admin/cron-status in ~5 min (15s if cache warm).",
         "log":      str(log_path),
     }
 
