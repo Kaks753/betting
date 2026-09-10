@@ -69,9 +69,10 @@ import requests
 # ── Paths ────────────────────────────────────────────────────────────────────
 
 BASE_DIR       = Path(__file__).parent
-DATA_DIR       = BASE_DIR / "data"
-PROCESSED_DIR  = DATA_DIR / "processed"
-SNAPSHOTS_DIR  = DATA_DIR / "odds_snapshots"
+DATA_DIR       = Path(os.environ.get("DATA_DIR", str(BASE_DIR / "data")))
+PROCESSED_DIR  = Path(__file__).parent / "data" / "processed"  # parquet is static in repo, not on volume
+# Snapshots live on DATA_DIR (persistent volume on Render) if set, else repo
+SNAPSHOTS_DIR  = DATA_DIR / "odds_snapshots" if os.environ.get("DATA_DIR") else BASE_DIR / "data" / "odds_snapshots"
 MANIFEST_PATH  = SNAPSHOTS_DIR / "_manifest.json"
 PARQUET_PATH   = PROCESSED_DIR / "all_matches.parquet"
 
@@ -164,6 +165,11 @@ class OddsAPISnapshotter:
                 log.warning(f"  [422] No data at that timestamp — skipping")
                 return None
             elif resp.status_code == 401:
+                # Free plan returns 401 for historical endpoint — not invalid key, just no history on free
+                body = resp.text
+                if "HISTORICAL_UNAVAILABLE_ON_FREE" in body:
+                    log.warning("  [401] Historical endpoint requires paid plan — using synthetic fallback (live odds still work on free)")
+                    return None
                 log.error("  [401] Invalid API key")
                 return None
             elif resp.status_code == 429:
