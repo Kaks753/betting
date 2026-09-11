@@ -80,22 +80,22 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 # ---------------------------------------------------------------------------
 
 CARD_CONFIG = {
-    # EV thresholds (post-slippage) — wise rebalanced for 1x2 diversity
-    "1x2_ev_thresh":       0.025,  # 2.5% (down from 3% → more 1x2)
-    "ou_ev_thresh":        0.04,   # 4% for O/U
-    "btts_ev_thresh":      0.05,   # 5% for BTTS
+    # EV thresholds (post-slippage) — pick best mix (not just O/U)
+    "1x2_ev_thresh":       0.02,   # 2.0% → mix enabler
+    "ou_ev_thresh":        0.035,  # 3.5% slightly down
+    "btts_ev_thresh":      0.04,   # 4% down from 5%
     "corners_ev_thresh":   0.04,
     "cards_ev_thresh":     0.05,
 
     # Confidence filters
-    "1x2_min_prob":        0.25,
-    "ou_min_prob":         0.35,
-    "btts_min_prob":       0.35,
+    "1x2_min_prob":        0.22,
+    "ou_min_prob":         0.32,
+    "btts_min_prob":       0.32,
     "corners_min_prob":    0.40,
     "cards_min_prob":      0.40,
 
     # Pinnacle gap: blended prob must beat Pinnacle de-vig by this margin
-    "1x2_vs_pin_gap":      0.012,  # down from 0.015 → +30% more 1x2
+    "1x2_vs_pin_gap":      0.008,  # mix enabler (was 0.012)
 
     # DC / Pinnacle blend weight
     "blend_dc_weight":     0.20,   # 20% DC, 80% Pinnacle
@@ -959,9 +959,21 @@ class DailyCardEngine:
         selected: List[Bet] = []
         match_counts: Dict[str, int] = {}
         team_counts: Dict[str, int] = {}
+        market_counts: Dict[str, int] = {}
+
+        def market_key(b: Bet) -> str:
+            m = b.market.lower()
+            if "1x2" in m: return "1x2"
+            if "o/u" in m or "over/under" in m: return "ou"
+            if "btts" in m: return "btts"
+            return m
 
         def can_add(b: Bet) -> bool:
             if match_counts.get(b.match, 0) >= CARD_CONFIG["max_bets_per_match"]:
+                return False
+            # Market diversity: max 6 per market to enforce mix (pick best across markets)
+            mk = market_key(b)
+            if market_counts.get(mk, 0) >= 6:
                 return False
             # Team collision guard: same team max 2 times across card (kill Bayern twice artifact)
             ht = (b.home_team or b.match.split(" vs ")[0] if " vs " in b.match else "").strip().lower()
@@ -975,6 +987,7 @@ class DailyCardEngine:
         def add_bet(b: Bet):
             selected.append(b)
             match_counts[b.match] = match_counts.get(b.match, 0) + 1
+            market_counts[market_key(b)] = market_counts.get(market_key(b), 0) + 1
             ht = (b.home_team or b.match.split(" vs ")[0] if " vs " in b.match else "").strip().lower()
             at = (b.away_team or b.match.split(" vs ")[-1] if " vs " in b.match else "").strip().lower()
             if ht:
