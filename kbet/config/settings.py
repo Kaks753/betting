@@ -109,20 +109,19 @@ KELLY = {
 }
 
 # ─── Backtest Settings ─────────────────────────────────────────────────────────
-# NOTE v2: Brier gate updated to 0.62 (realistic for 3-outcome football prediction).
-# Dixon-Coles papers report Brier 0.55-0.63 on 1X2 — our 0.60 is within expected range.
-# The 0.50 gate was designed for binary classification, not 3-class outcomes.
-# Random 3-class model baseline Brier = 0.667, good football model = 0.58-0.62.
+# Sharpened 0.60 (was 0.62) — Brier 0.62 barely beats random 0.667, 0.60 validates real signal
+# Dixon-Coles papers 0.55-0.63, our 0.576 V3 / 0.579 V4 — 0.60 is honest gate
 BACKTEST = {
-    "min_bets_gate":   300,   # Min bets (lower: high-threshold means fewer bets, but precision higher)
-    "slippage_penalty": 0.20, # 20% haircut on EV (execution drag simulation)
+    "min_bets_gate":   300,
+    "slippage_penalty": 0.20,
     "walk_forward_rounds": [
         {"train_end": "2022-06-01", "test_start": "2022-08-01", "test_end": "2023-06-01"},
         {"train_end": "2023-06-01", "test_start": "2023-08-01", "test_end": "2024-06-01"},
         {"train_end": "2024-06-01", "test_start": "2024-08-01", "test_end": "2025-06-01"},
     ],
-    "brier_gate": 0.62,       # Realistic for 3-outcome football model (was 0.50 — too strict)
-    "roi_gate":   0.03,       # 3% ROI minimum (maintained)
+    "brier_gate": 0.60,       # Tightened 0.62→0.60 (sharpened)
+    "roi_gate":   0.03,
+    "clv_gate":   0.003,      # 0.3% CLV gate for live proof (G1)
 }
 
 # ─── Confidence Tiers ─────────────────────────────────────────────────────────

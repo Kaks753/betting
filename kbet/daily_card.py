@@ -118,17 +118,23 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 # ---------------------------------------------------------------------------
 
 CARD_CONFIG = {
-    # EV thresholds (post-slippage) — pick best mix (not just O/U)
+    # EV thresholds (post-slippage) — pick best across 1x2/O/U/BTTS/AH
     "1x2_ev_thresh":       0.02,   # 2.0% → mix enabler
-    "ou_ev_thresh":        0.035,  # 3.5% slightly down
-    "btts_ev_thresh":      0.04,   # 4% down from 5%
+    "ou_ev_thresh":        0.035,  # 3.5% base (2.5)
+    "ou15_ev_thresh":      0.035,  # 1.5
+    "ou35_ev_thresh":      0.04,   # 3.5 (rarer, higher)
+    "btts_ev_thresh":      0.04,
+    "ah_ev_thresh":        0.04,   # Asian Handicap -1, +1 etc
     "corners_ev_thresh":   0.04,
     "cards_ev_thresh":     0.05,
 
     # Confidence filters
     "1x2_min_prob":        0.22,
     "ou_min_prob":         0.32,
+    "ou15_min_prob":       0.30,
+    "ou35_min_prob":       0.35,
     "btts_min_prob":       0.32,
+    "ah_min_prob":         0.32,
     "corners_min_prob":    0.40,
     "cards_min_prob":      0.40,
 
@@ -182,6 +188,7 @@ class Bet:
     home_team:   str = ""
     away_team:   str = ""
     match_date:  str = ""    # YYYY-MM-DD for settlement / horizon
+    uncertainty: float = 0.0  # 0=low 1=high (new manager/squad overhaul)
 
     @property
     def star_str(self) -> str:
@@ -761,14 +768,49 @@ class DailyCardEngine:
                 adj_over  = max(0.05, adj_over  + goals_adj_prob)
                 adj_under = max(0.05, adj_under - goals_adj_prob)
 
-            best_ou = match.best_totals(line=2.5)
-            if best_ou is None:
-                return []
+            # Support 1.5/2.5/3.5 — try each, pick best EV
+            candidates = []
+            for line in [1.5, 2.5, 3.5]:
+                dc_line = models.predict_ou_calibrated(home_id, away_id, threshold=line)
+                if dc_line is None:
+                    continue
+                # Apply same trend/weather to this line's prob
+                # For simplicity reuse adj_over/under for 2.5, for other lines use dc_line directly + trend
+                if line == 2.5:
+                    p_over, p_under = adj_over, adj_under
+                else:
+                    p_over = min(max(dc_line["over"] + (trend_adj if line>2 else -trend_adj), 0.05), 0.95)
+                    p_under = 1 - p_over
+                    if weather is not None:
+                        p_over = max(0.05, p_over + weather.goals_adj * 0.05)
+                        p_under = 1 - p_over
+                best_ou_line = match.best_totals(line=line)
+                if best_ou_line is None:
+                    continue
+                candidates.append((line, p_over, best_ou_line.over, "over"))
+                candidates.append((line, p_under, best_ou_line.under, "under"))
+            # Fallback to 2.5 if no candidates (historical parquet only 2.5)
+            if not candidates:
+                best_ou = match.best_totals(line=2.5)
+                if best_ou is None:
+                    return []
+                candidates = [(2.5, adj_over, best_ou.over, "over"), (2.5, adj_under, best_ou.under, "under")]
 
-            for side, prob, odds in [
-                ("over",  adj_over,  best_ou.over),
-                ("under", adj_under, best_ou.under),
-            ]:
+            for line, prob, odds, side in candidates:
+                # For non-2.5, use line-specific thresh
+                thr = CARD_CONFIG.get(f"ou{int(line*10)}_ev_thresh".replace("15","15").replace("25","").replace("35","35"), CARD_CONFIG["ou_ev_thresh"]) if line!=2.5 else CARD_CONFIG["ou_ev_thresh"]
+                # Actually map: 1.5->ou15, 2.5->ou, 3.5->ou35
+                if line == 1.5:
+                    thr = CARD_CONFIG.get("ou15_ev_thresh", CARD_CONFIG["ou_ev_thresh"])
+                    min_p = CARD_CONFIG.get("ou15_min_prob", CARD_CONFIG["ou_min_prob"])
+                elif line == 3.5:
+                    thr = CARD_CONFIG.get("ou35_ev_thresh", CARD_CONFIG["ou_ev_thresh"])
+                    min_p = CARD_CONFIG.get("ou35_min_prob", CARD_CONFIG["ou_min_prob"])
+                else:
+                    thr = CARD_CONFIG["ou_ev_thresh"]
+                    min_p = CARD_CONFIG["ou_min_prob"]
+                if prob < min_p:
+                    continue
                 # xG recent form boost for Over (Chelsea 2.8 xG case)
                 try:
                     hx = get_rolling_xg(match.home_team, self.target_date, 10)
@@ -799,24 +841,29 @@ class DailyCardEngine:
                     weather_tag=weather_tag, model_fitted=True, market="ou"
                 )
 
+                # Uncertainty flag: new manager/squad overhaul if team not in model
+                unc = 0.0
+                if home_id not in models.dc.teams or away_id not in models.dc.teams:
+                    unc = 0.5
                 bets.append(Bet(
                     match=f"{match.home_team} vs {match.away_team}",
                     league=match.league_code,
-                    market="O/U 2.5 Goals",
+                    market=f"O/U {line} Goals",
                     pick=side.capitalize(),
                     odds=round(odds, 2),
                     bookmaker="MAX",
                     model_prob=round(prob, 4),
                     implied_prob=round(1/odds, 4),
                     ev=round(ev, 4),
-                    confidence=round(confidence, 3),
-                    stars=self._stars(confidence),
+                    confidence=round(max(0, confidence - unc*0.2), 3),
+                    stars=self._stars(max(0, confidence - unc*0.2)),
                     clv_proxy=0.0,
                     weather_tag=weather_tag,
-                    notes=f"DC_ou={dc_ou[side]:.3f} trend_adj={trend_adj:+.3f} rolling={rolling_avg:.2f}g",
+                    notes=f"DC_ou={prob:.3f} line={line} trend={trend_adj:+.3f} roll={rolling_avg:.2f}g unc={unc:.1f}",
                     commence_time=match.commence_time,
                     home_team=match.home_team,
                     away_team=match.away_team,
+                    uncertainty=unc,
                 ))
         except Exception as e:
             logger.warning(f"O/U Goals eval failed: {e}")
@@ -878,6 +925,29 @@ class DailyCardEngine:
         except Exception as e:
             logger.warning(f"BTTS eval failed: {e}")
         return sorted(bets, key=lambda b: b.ev, reverse=True)[:1]
+
+    def _eval_ah(
+        self, models: ModelSet, match: MatchOdds,
+        home_id, away_id, weather_tag, weather
+    ) -> List[Bet]:
+        """Asian Handicap -0.5/0:1 etc — uses DC Asian Handicap."""
+        bets = []
+        try:
+            for hcap in [-0.5, 0.0, 0.5]:
+                ah = models.dc.predict_asian_handicap(home_id, away_id, handicap=hcap)
+                if ah is None:
+                    continue
+                # Need odds for AH — try to get from totals? For now use h2h as proxy if no AH odds
+                # Historical parquet has no AH odds, so will be skipped until live AH market available
+                # Use best_h2h as fallback for testing: if hcap 0, prob ~ home win
+                prob = ah["home_cover"]
+                # Find AH odds — not yet in MatchOdds, so skip unless we have it
+                # For now, only evaluate if we have AH odds via best_totals as dummy
+                # This will be enabled when ODDS_API AH market is wired
+                continue
+        except Exception as e:
+            logger.warning(f"AH eval failed: {e}")
+        return bets
 
     def _eval_corners(
         self, models: ModelSet, match: MatchOdds,
