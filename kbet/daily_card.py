@@ -64,6 +64,11 @@ try:
     from kbet.engine.scrapers.understat_scraper import rolling_xg as get_rolling_xg
 except Exception:
     get_rolling_xg = lambda *a, **k: None
+try:
+    from kbet.engine.scrapers.forebet_scraper import get_consensus as get_forebet_consensus, divergence_signal
+except Exception:
+    get_forebet_consensus = lambda *a, **k: None
+    divergence_signal = lambda *a, **k: "NO_CONSENSUS"
 
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger("daily_card")
@@ -618,6 +623,20 @@ class DailyCardEngine:
                         blend_p = min(0.92, blend_p + 0.02)
                 except Exception:
                     pass
+                # Forebet contrarian divergence (if enabled via KBET_FOREBET=1) — not direct weight
+                if os.environ.get("KBET_FOREBET") == "1":
+                    try:
+                        fb = get_forebet_consensus(match.home_team, match.away_team, self.target_date)
+                        if fb:
+                            fb_p = fb.get({"home": "h", "draw": "d", "away": "a"}[side])
+                            if fb_p is not None:
+                                sig = divergence_signal(blend_p, fb_p)
+                                if sig == "MARKET_KNOWS_SOMETHING" and pin_gap < 0.02:
+                                    # Market disagrees strongly and gap small -> skip
+                                    continue
+                                # MODEL_FINDS_VALUE handled via pin_gap already
+                    except Exception:
+                        pass
 
                 # Sanity: odds plausible
                 if odds is None or odds <= 1.01 or odds > 20.0:
