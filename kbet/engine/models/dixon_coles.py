@@ -22,7 +22,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 from config.settings import DIXON_COLES
 
 
-XI      = DIXON_COLES["xi"]            # Time decay parameter
+XI      = DIXON_COLES["xi"]            # Time decay parameter (base)
+XI_LIVE   = DIXON_COLES.get("xi_live", 0.010)  # Live recency 70d
 MIN_GAMES = DIXON_COLES["min_games"]   # Cold start threshold
 
 
@@ -102,7 +103,7 @@ class DixonColesModel:
         self.n_matches   = 0
 
     def fit(self, matches: pd.DataFrame, as_of_date: pd.Timestamp,
-            verbose: bool = False) -> "DixonColesModel":
+            verbose: bool = False, xi: float = None) -> "DixonColesModel":
         """
         Fit the model on historical matches before as_of_date.
 
@@ -111,6 +112,7 @@ class DixonColesModel:
         matches     : DataFrame with home_uuid, away_uuid, home_goals, away_goals, date
         as_of_date  : Only use data before this date (backtest safety — no look-ahead)
         verbose     : Print optimization progress
+        xi          : Override time decay (live 0.010 vs base 0.0065)
         """
         data = matches[matches["date"] < as_of_date].copy()
 
@@ -119,10 +121,11 @@ class DixonColesModel:
                 print(f"  Not enough data to fit ({len(data)} matches)")
             return self
 
-        # Add time decay weights
+        # Add time decay weights — use xi override if provided
         ref_date = as_of_date
+        _xi = xi if xi is not None else XI
         data["_days_ago"] = (ref_date - data["date"]).dt.days
-        data["_weight"]   = data["_days_ago"].apply(lambda d: time_weight(d))
+        data["_weight"]   = data["_days_ago"].apply(lambda d: time_weight(d, xi=_xi))
 
         # Get teams with enough games
         home_counts = data.groupby("home_uuid").size()

@@ -21,7 +21,7 @@ LEAGUES = [
 
 # Seasons to download (football-data.co.uk format)
 SEASONS = [
-    "1819", "1920", "2021", "2122", "2223", "2324", "2425"
+    "1819", "1920", "2021", "2122", "2223", "2324", "2425", "2526"
 ]
 
 # CSV column mappings from football-data.co.uk
@@ -71,8 +71,10 @@ FDCUK_COLUMNS = {
 }
 
 # ─── Model Parameters ──────────────────────────────────────────────────────────
+# 18mo window + xi 0.010 live (70d half-life) — was 1095 3yr 0.0065 107d stale (Chelsea case)
 DIXON_COLES = {
-    "xi": 0.0065,           # Half-life decay: e^(-xi*days_ago), ~107 day half-life
+    "xi": 0.0065,           # Base half-life 107d; live uses 0.010 (70d) via daily_card.py live branch
+    "xi_live": 0.010,       # Live recency (70d) — new coach/squad overhaul
     "min_games": 5,         # Minimum games before model trusts team ratings
     "home_advantage": 0.25, # Initial home advantage parameter (log scale)
 }

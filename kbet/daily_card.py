@@ -60,6 +60,10 @@ from kbet.engine.data.odds_client import OddsAPIClient, MatchOdds, OddsAPIKeyMis
 from kbet.engine.data.weather_client import WeatherClient
 from kbet.engine.data.clubelo_client import ClubEloClient
 from kbet.engine.utils.entity_resolver import EntityRegistry as EntityResolver
+try:
+    from kbet.engine.scrapers.understat_scraper import rolling_xg as get_rolling_xg
+except Exception:
+    get_rolling_xg = lambda *a, **k: None
 
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger("daily_card")
@@ -186,7 +190,7 @@ class ModelSet:
     Cache is keyed by as_of_date — stale by 12h or when data is newer.
     """
 
-    TRAINING_WINDOW_DAYS = 3 * 365   # 3-year lookback (exponential decay makes older data near-zero)
+    TRAINING_WINDOW_DAYS = 540       # 18-month lookback (recency fix: was 1095 3yr — stale for Chelsea new coach)
     CACHE_MAX_AGE_HOURS  = 12        # Refit if cache > 12h old
 
     def __init__(self, as_of_date: pd.Timestamp, all_df: pd.DataFrame,
@@ -218,7 +222,16 @@ class ModelSet:
         print(f"  [1/4] Fitting Dixon-Coles ({as_of_date.date()}, "
               f"window={self.TRAINING_WINDOW_DAYS}d, {len(dc_df):,} matches)...")
         self.dc = DixonColesModel()
-        self.dc.fit(dc_df, as_of_date)
+        # Live recency: use xi 0.010 (70d) if as_of is recent (<90d from now), else base 0.0065
+        try:
+            from kbet.config.settings import DIXON_COLES as _DC
+            is_live = (pd.Timestamp.now() - as_of_date).days < 90
+            xi_use = _DC.get("xi_live", 0.010) if is_live else _DC.get("xi", 0.0065)
+            if is_live:
+                print(f"       Live mode xi={xi_use} (70d half-life) for recency")
+        except Exception:
+            xi_use = None
+        self.dc.fit(dc_df, as_of_date, xi=xi_use)
         print(f"        DC: {self.dc.n_matches} matches, {len(self.dc.teams)} teams  OK")
 
         print("  [2/4] Isotonic calibrators...")
@@ -595,6 +608,16 @@ class DailyCardEngine:
             for side, (odds, pick) in odds_map.items():
                 blend_p = blended[side]
                 pin_p   = pin_probs[side]
+                # xG form adjustment (if available) — boosts recency for Chelsea-like overhaul
+                try:
+                    hx = get_rolling_xg(match.home_team, self.target_date, 10)
+                    ax = get_rolling_xg(match.away_team, self.target_date, 10)
+                    if hx and ax and side == "home" and hx["xg_for_avg"] > 1.8 and hx["xg_for_avg"] > ax["xg_against_avg"]:
+                        blend_p = min(0.92, blend_p + 0.02)
+                    if hx and ax and side == "away" and ax["xg_for_avg"] > 1.8 and ax["xg_for_avg"] > hx["xg_against_avg"]:
+                        blend_p = min(0.92, blend_p + 0.02)
+                except Exception:
+                    pass
 
                 # Sanity: odds plausible
                 if odds is None or odds <= 1.01 or odds > 20.0:
@@ -698,6 +721,16 @@ class DailyCardEngine:
                 ("over",  adj_over,  best_ou.over),
                 ("under", adj_under, best_ou.under),
             ]:
+                # xG recent form boost for Over (Chelsea 2.8 xG case)
+                try:
+                    hx = get_rolling_xg(match.home_team, self.target_date, 10)
+                    ax = get_rolling_xg(match.away_team, self.target_date, 10)
+                    if hx and ax and side == "over" and (hx["xg_for_avg"] + ax["xg_for_avg"]) > 3.0:
+                        prob = min(0.92, prob + 0.03)
+                    if hx and ax and side == "under" and (hx["xg_against_avg"] + ax["xg_against_avg"]) < 1.5:
+                        prob = min(0.92, prob + 0.02)
+                except Exception:
+                    pass
                 if prob < CARD_CONFIG["ou_min_prob"]:
                     continue
                 if odds < CARD_CONFIG["min_odds"] or odds > CARD_CONFIG["max_odds"]:
