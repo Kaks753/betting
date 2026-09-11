@@ -1,0 +1,33 @@
+name: Daily Card Cron
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # 04:00 UTC daily — softest odds
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+      - name: Generate daily card (live if key set, else simulate)
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          KBET_ENV: production
+          DATA_DIR: kbet/data
+        run: |
+          python kbet/cron_runner.py --card-only --force || python kbet/daily_card.py --date $(date -u +%Y-%m-%d) --simulate
+          ls -lh kbet/data/daily_cards/
+          cat kbet/data/daily_cards/card_$(date -u +%Y%m%d).json | head -n 20
+      - name: Commit card to repo (persistent history)
+        run: |
+          git config user.name "kbet-bot"
+          git config user.email "bot@kbet.local"
+          git add kbet/data/daily_cards/*.json kbet/data/public_picks/*.txt || true
+          git diff --cached --quiet || git commit -m "chore(cron): daily card $(date -u +%Y-%m-%d) [skip ci]"
+          git push || true

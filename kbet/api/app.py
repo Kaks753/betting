@@ -536,6 +536,38 @@ async def get_performance(
     return stats
 
 
+@app.get("/performance/history", tags=["analytics"])
+async def get_performance_history(
+    days: int = Query(default=90, ge=7, le=365),
+    db: Database = Depends(get_db),
+) -> Dict:
+    """Bankroll history for chart: daily P&L + cumulative."""
+    conn = db.connect()
+    rows = conn.execute("""
+        SELECT match_date as date, SUM(pnl) as daily_pnl, COUNT(*) as n
+        FROM bets
+        WHERE result IS NOT NULL AND match_date IS NOT NULL
+          AND match_date >= date('now', '-{} days')
+        GROUP BY match_date
+        ORDER BY date
+    """.format(days)).fetchall()
+    # Fallback to all-time if no recent
+    if not rows:
+        rows = conn.execute("""
+            SELECT match_date as date, SUM(pnl) as daily_pnl, COUNT(*) as n
+            FROM bets
+            WHERE result IS NOT NULL
+            GROUP BY match_date
+            ORDER BY date
+        """).fetchall()
+    hist = []
+    cum = 1000.0
+    for r in rows:
+        cum += r["daily_pnl"] or 0
+        hist.append({"date": r["date"], "daily_pnl": round(r["daily_pnl"] or 0, 2), "bankroll": round(cum, 2), "n": r["n"]})
+    return {"history": hist, "start_bankroll": 1000.0, "current_bankroll": round(cum, 2) if hist else 1000.0}
+
+
 # ── CLV ───────────────────────────────────────────────────────────────────────
 
 @app.get("/clv", tags=["analytics"])

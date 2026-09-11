@@ -880,6 +880,17 @@
         </div>
       </div>
 
+      <!-- Bankroll curve -->
+      <div class="panel fade-in">
+        <div class="panel-header">
+          <span>💰</span> Bankroll (1000 start)
+        </div>
+        <div class="panel-body" id="bankrollPanel" style="padding:0">
+          <canvas id="bankrollChart" height="140" style="width:100%;display:block"></canvas>
+          <div id="bankrollEmpty" style="color:var(--text3);font-size:.78rem;text-align:center;padding:1rem 0">No settled history yet — curve appears after 1 settlement</div>
+        </div>
+      </div>
+
       <!-- System status -->
       <div class="panel fade-in">
         <div class="panel-header">
@@ -1451,6 +1462,41 @@
       + 'ROI, win rate and CLV appear once bets are placed and settled.</div>';
   }
 
+  // ── Bankroll chart ──
+  async function loadBankroll() {
+    try {
+      const r = await fetch(API + '/performance/history?days=90');
+      if (!r.ok) return;
+      const d = await r.json();
+      const hist = d.history || [];
+      const empty = document.getElementById('bankrollEmpty');
+      const canvas = document.getElementById('bankrollChart');
+      if (!hist.length) { if(empty) empty.style.display='block'; if(canvas) canvas.style.display='none'; return; }
+      if(empty) empty.style.display='none'; if(canvas) canvas.style.display='block';
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width = canvas.offsetWidth * 2;
+      const H = canvas.height = 140 * 2;
+      ctx.clearRect(0,0,W,H);
+      const vals = hist.map(h=>h.bankroll);
+      const min = Math.min(...vals, 1000), max = Math.max(...vals, 1000);
+      const pad = 20*2, range = (max-min)||1;
+      ctx.strokeStyle = '#1f2f47'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(pad, H-pad); ctx.lineTo(W-pad, H-pad); ctx.stroke();
+      ctx.strokeStyle = '#10b981'; ctx.lineWidth=2; ctx.beginPath();
+      hist.forEach((h,i)=>{
+        const x = pad + (W-2*pad)*(i/(hist.length-1||1));
+        const y = H-pad - (H-2*pad)*((h.bankroll-min)/range);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      // fill
+      ctx.lineTo(W-pad, H-pad); ctx.lineTo(pad, H-pad); ctx.closePath();
+      ctx.fillStyle='rgba(16,185,129,0.08)'; ctx.fill();
+      // last value
+      ctx.fillStyle='#e2e8f0'; ctx.font='12px JetBrains Mono'; ctx.fillText(hist[hist.length-1].bankroll.toFixed(0)+'u', W-pad-60, 20);
+    } catch(e){}
+  }
+
   // ── System status ──
   async function loadStatus() {
     try {
@@ -1526,7 +1572,7 @@
     const btn = document.getElementById('refreshBtn');
     btn.classList.add('spinning');
     stopPolling(); pollCount = 0;
-    await Promise.all([loadCard(), loadPerf(), loadStatus()]);
+    await Promise.all([loadCard(), loadPerf(), loadStatus(), loadBankroll()]);
     btn.classList.remove('spinning');
     showToast('Refreshed');
   }
@@ -1539,7 +1585,7 @@
   // ── Init ──
   (async function() {
     updateDateLabel();
-    await Promise.all([loadCard(), loadPerf(), loadStatus()]);
+    await Promise.all([loadCard(), loadPerf(), loadStatus(), loadBankroll()]);
   })();
 
   // Background sync every 90s when card is loaded

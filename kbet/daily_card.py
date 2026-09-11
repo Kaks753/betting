@@ -146,7 +146,11 @@ CARD_CONFIG = {
     "cards_min_prob":      0.40,
 
     # Pinnacle gap: blended prob must beat Pinnacle de-vig by this margin
-    "1x2_vs_pin_gap":      0.008,  # mix enabler (was 0.012)
+    "1x2_vs_pin_gap":      0.008,  # base mix enabler (was 0.012)
+    "league_pin_gap": {  # softer leagues (B1,G1 etc) need smaller gap
+        "E0": 0.012, "SP1": 0.010, "D1": 0.010, "I1": 0.010, "F1": 0.010,
+        "E1": 0.008, "N1": 0.008, "P1": 0.008, "B1": 0.006, "G1": 0.006,
+    },
 
     # DC / Pinnacle blend weight
     "blend_dc_weight":     0.20,   # 20% DC, 80% Pinnacle
@@ -537,6 +541,11 @@ class DailyCardEngine:
             return []
         self._last_match_count = len(matches)
         print(f"\n  Fetching match odds for {date_str}... Found {len(matches)} matches")
+        # International break detection: if no Top5 (E0/SP1/D1/I1/F1) in this date, flag
+        top5 = {"E0", "SP1", "D1", "I1", "F1"}
+        has_top5 = any(m.league_code in top5 for m in matches)
+        if not has_top5 and len(matches) > 0:
+            print(f"  [BREAK] No Top5 fixtures for {date_str} — fringe leagues only (possible international break)")
 
         # Weather skip logic
         skip_external = False
@@ -689,10 +698,11 @@ class DailyCardEngine:
                 if ev > WARN_EV:
                     logger.info(f"[EV WARN] {match.home_team} v {match.away_team} {pick}: EV={ev:.1%} verify")
 
-                # Must genuinely exceed Pinnacle — use RAW DC gap (not blend) — 5x less strict
+                # Must genuinely exceed Pinnacle — use RAW DC gap (not blend) — 5x less strict; league-weighted
                 dc_gap = dc_cal_p - pin_p
                 pin_gap = dc_gap  # for confidence/clv downstream
-                if dc_gap < CARD_CONFIG["1x2_vs_pin_gap"]:
+                league_gap = CARD_CONFIG.get("league_pin_gap", {}).get(match.league_code, CARD_CONFIG["1x2_vs_pin_gap"])
+                if dc_gap < league_gap:
                     continue
                 # Forebet contrarian divergence — gated G3 (off until BTTS CLV), env KBET_FOREBET=1
                 if os.environ.get("KBET_FOREBET") == "1" and _is_g2_passed():

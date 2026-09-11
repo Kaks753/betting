@@ -75,6 +75,10 @@ FDCUK_COLUMNS = {
 DIXON_COLES = {
     "xi": 0.0065,           # Base half-life 107d; live uses 0.010 (70d) via daily_card.py live branch
     "xi_live": 0.010,       # Live recency (70d) — new coach/squad overhaul
+    "xi_per_league": {      # Per-league tuning — EPL consistent short, lower leagues longer
+        "E0": 0.010, "SP1": 0.010, "D1": 0.010, "I1": 0.010, "F1": 0.010,
+        "E1": 0.008, "N1": 0.008, "P1": 0.008, "B1": 0.0065, "G1": 0.0065,
+    },
     "min_games": 5,         # Minimum games before model trusts team ratings
     "home_advantage": 0.25, # Initial home advantage parameter (log scale)
 }
