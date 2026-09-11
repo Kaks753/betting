@@ -405,56 +405,48 @@ class DailyCardEngine:
         self._horizon_dates = [self.target_date]
 
         all_bets = self._evaluate_date(self.target_date, models)
-        if not all_bets:
-            # If no matches (empty), still return empty (fallback handled by caller)
-            return []
-
-        # Adaptive merge: if thin day (<5 actionable or avg EV <0.08), pull next day
+        # Allow empty to trigger adaptive merge (thin Monday or no fixtures today)
         actionable = [b for b in all_bets if b.ev > 0]
         avg_ev = sum(b.ev for b in actionable) / len(actionable) if actionable else 0
-        need_merge = len(actionable) < 5 or (actionable and avg_ev < 0.08)
+        need_merge = len(actionable) < 5 or (actionable and avg_ev < 0.08) or len(all_bets) == 0
         # Also merge if total matches <8 (very thin Monday)
-        # Check original matches count via _last_matches cache
         if hasattr(self, '_last_match_count') and self._last_match_count < 8:
             need_merge = True
 
         if need_merge:
-            next_date = (pd.Timestamp(self.target_date) + pd.Timedelta(days=1)).strftime("%Y-%m-%d")
-            # Don't merge if next_date beyond historical data max (both would fallback to same historic set)
             parquet_max = self.all_df["date"].max()
-            if pd.Timestamp(next_date) > parquet_max + pd.Timedelta(days=2):
-                print(f"  [ADAPTIVE] Thin but next day {next_date} beyond data max {parquet_max.date()} -> skip merge")
-            else:
-                print(f"  [ADAPTIVE] Thin day ({len(actionable)} bets, avg EV {avg_ev:.1%}, matches {getattr(self,'_last_match_count', '?')}) -> merging {next_date}")
-                # Temporarily switch target for fetch
-                orig_target = self.target_date
+            orig_target = self.target_date
+            # Try up to 2 extra days (horizon 3) until we have >=5 bets
+            for offset in [1, 2]:
+                next_date = (pd.Timestamp(orig_target) + pd.Timedelta(days=offset)).strftime("%Y-%m-%d")
+                if self.simulate and pd.Timestamp(next_date) > parquet_max + pd.Timedelta(days=2):
+                    print(f"  [ADAPTIVE] Skip {next_date} beyond data max {parquet_max.date()} (simulate)")
+                    continue
+                # Re-evaluate need (check current all_bets)
+                cur_actionable = [b for b in all_bets if b.ev > 0]
+                cur_avg = sum(b.ev for b in cur_actionable)/len(cur_actionable) if cur_actionable else 0
+                if len(cur_actionable) >=5 and cur_avg >=0.08 and len(all_bets) >=5:
+                    break
+                # Try this next date
+                if offset == 1:
+                    print(f"  [ADAPTIVE] Thin day ({len(cur_actionable)} bets, avg EV {cur_avg:.1%}, matches {getattr(self,'_last_match_count', '?')}) -> merging {next_date}")
+                else:
+                    print(f"  [ADAPTIVE] Still thin ({len(cur_actionable)} bets) -> trying {next_date}")
                 self.target_date = next_date
                 more_bets = self._evaluate_date(next_date, models)
                 self.target_date = orig_target
                 if more_bets:
-                    # Tag extra bets with their true date for settlement
                     for b in more_bets:
+                        b.match_date = next_date
                         if not b.commence_time or b.commence_time[:10] == orig_target:
                             b.commence_time = f"{next_date} {b.commence_time[11:] if len(b.commence_time)>10 else '00:00:00'}"
-                            b.match_date = next_date
                     all_bets = all_bets + more_bets
-                    self._horizon = 2
-                    self._horizon_dates = [orig_target, next_date]
-                    print(f"  [ADAPTIVE] Merged -> {len(all_bets)} total bets across 2 days")
-            # else: keep single day
-        # If we didn't merge via above else, need to ensure more_bets not referenced
-        if 'more_bets' not in locals():
-            more_bets = []
-            if more_bets:
-                # Tag extra bets with their true date for settlement
-                for b in more_bets:
-                    if not b.commence_time or b.commence_time[:10] == orig_target:
-                        b.commence_time = f"{next_date} {b.commence_time[11:] if len(b.commence_time)>10 else '00:00:00'}"
-                        b.match_date = next_date
-                all_bets = all_bets + more_bets
-                self._horizon = 2
-                self._horizon_dates = [orig_target, next_date]
-                print(f"  [ADAPTIVE] Merged -> {len(all_bets)} total bets across 2 days")
+                    self._horizon = offset + 1
+                    self._horizon_dates = [orig_target] + [(pd.Timestamp(orig_target)+pd.Timedelta(days=i)).strftime("%Y-%m-%d") for i in range(1, offset+1)]
+                    print(f"  [ADAPTIVE] Merged -> {len(all_bets)} total bets across {self._horizon} days")
+                # Continue loop if still thin
+            # end for
+            # else: keep single day if loop didn't help
 
         # Rank and filter (with team collision guard)
         final_card = self._rank_and_select(all_bets, max_bets)
@@ -473,6 +465,12 @@ class DailyCardEngine:
         matches = self._get_matches()
         if need_switch:
             self.target_date = orig
+        # For live mode, filter matches to this specific date (API returns next 3 days)
+        if not self.simulate and matches:
+            filtered = [m for m in matches if m.commence_time[:10] == date_str]
+            # If strict filter yields 0 but API had matches for nearby dates, keep empty to trigger merge
+            # Don't fallback to all — keep empty so adaptive can try next day
+            matches = filtered
         if not matches:
             print(f"  [WARN] No matches found for {date_str}.")
             return []
