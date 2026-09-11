@@ -1115,6 +1115,10 @@
     var bookmakerHtml = bet.bookmaker ? '<span style="font-size:0.68rem;color:var(--text3)">via ' + esc(bet.bookmaker) + '</span>' : '';
     var notesHtml     = bet.notes ? '<span style="font-size:0.67rem;color:var(--text3);font-style:italic">' + esc(bet.notes.substring(0,55)) + '</span>' : '';
     var timeHtml      = timeStr ? '<span class="bet-time">' + timeStr + '</span>' : '';
+    // Badge 8px — EV primary, badge diagnostic (G1 day one) — green <8% consensus, yellow 8-12% mixed, red >12% contrarian
+    var badgeColor = ev >= 0.12 ? '#ef4444' : ev >= 0.08 ? '#f59e0b' : '#10b981';
+    var badgeTitle = ev >= 0.12 ? 'Contrarian — High EV confirm odds live' : ev >= 0.08 ? 'Mixed — verify' : 'Consensus — full Kelly';
+    var warnHtml = ev >= 0.12 ? '<div style="font-size:0.65rem;color:#f59e0b;margin-top:4px">⚠ High EV — confirm odds live before placing</div>' : '';
 
     return '<div class="bet-card fade-in' + (isFire ? ' fire-bet' : '') + '"'
       + ' style="--bet-color:' + betColor + '; animation-delay:' + (idx*0.06) + 's; opacity:0">'
@@ -1133,11 +1137,12 @@
           + bookmakerHtml
           + notesHtml
         + '</div>'
+        + warnHtml
       + '</div>'
       + '<div class="bet-right">'
         + '<span class="bet-ev ' + evCls + '" data-tip="Expected Value">' + fmtEV(ev) + '</span>'
         + '<span class="bet-odds" data-tip="Decimal Odds">@' + fmtOdds(odds) + '</span>'
-        + '<div class="bet-stars">' + starsHtml(stars) + '</div>'
+        + '<div class="bet-stars" style="display:flex;align-items:center;gap:6px">' + starsHtml(stars) + '<span title="' + badgeTitle + '" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + badgeColor + ';flex-shrink:0"></span></div>'
       + '</div>'
       + '</div>';
   }

@@ -73,6 +73,35 @@ except Exception:
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger("daily_card")
 
+# Gate helpers — BTTS and Forebet off until G1 50 CLV>0.3% (sequential Gates)
+_GATE_CACHE = {}
+def _is_g1_passed() -> bool:
+    """Check if G1 50 bets CLV>0.3% passed — cached."""
+    if "g1" in _GATE_CACHE:
+        return _GATE_CACHE["g1"]
+    try:
+        from kbet.db import Database
+        db = Database()
+        db.migrate()
+        # Use get_performance fallback all-time (covers free ephemeral)
+        perf = db.get_performance(days=365)
+        n = perf.get("n_bets", 0) or perf.get("n_settled", 0) or 0
+        clv = perf.get("avg_clv")
+        passed = n >= 50 and clv is not None and clv > 0.003
+        _GATE_CACHE["g1"] = passed
+        return passed
+    except Exception:
+        _GATE_CACHE["g1"] = False
+        return False
+def _is_g2_passed() -> bool:
+    """G2 BTTS CLV — for now same as G1, future separate BTTS CLV."""
+    if "g2" in _GATE_CACHE:
+        return _GATE_CACHE["g2"]
+    # Until BTTS has own tracking, reuse G1
+    passed = _is_g1_passed()
+    _GATE_CACHE["g2"] = passed
+    return passed
+
 # ---------------------------------------------------------------------------
 # Persistent storage paths
 # On Fly.io / Render with a mounted volume: set DATA_DIR=/data
@@ -623,8 +652,8 @@ class DailyCardEngine:
                         blend_p = min(0.92, blend_p + 0.02)
                 except Exception:
                     pass
-                # Forebet contrarian divergence (if enabled via KBET_FOREBET=1) — not direct weight
-                if os.environ.get("KBET_FOREBET") == "1":
+                # Forebet contrarian divergence — gated G3 (off until BTTS CLV), env KBET_FOREBET=1
+                if os.environ.get("KBET_FOREBET") == "1" and _is_g2_passed():
                     try:
                         fb = get_forebet_consensus(match.home_team, match.away_team, self.target_date)
                         if fb:
@@ -798,7 +827,9 @@ class DailyCardEngine:
         self, models: ModelSet, match: MatchOdds,
         home_id, away_id, weather_tag, weather
     ) -> List[Bet]:
-        """Evaluate BTTS Yes/No market."""
+        """Evaluate BTTS Yes/No market — gated G2 (off until G1 CLV>0.3% 50 bets)."""
+        if not _is_g1_passed():
+            return []  # Gate G2: keep base 1x2+O/U until 50 CLV proven
         bets = []
         try:
             btts_pred = models.dc.predict_btts(home_id, away_id)
