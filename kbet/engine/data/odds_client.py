@@ -274,7 +274,7 @@ class OddsAPIClient:
                 "ODDS_API_KEY not set. Export it or pass api_key= to OddsAPIClient()."
             )
         if markets is None:
-            markets = ["h2h", "totals", "btts"]
+            markets = ["h2h", "totals"]
 
         sport_keys = [
             LEAGUE_TO_SPORT_KEY[lc]
@@ -322,7 +322,7 @@ class OddsAPIClient:
         if not self.api_key:
             raise OddsAPIKeyMissingError("API key required for historical snapshots.")
         if markets is None:
-            markets = ["h2h", "totals", "btts"]
+            markets = ["h2h", "totals"]
 
         sport_keys = [
             LEAGUE_TO_SPORT_KEY[lc]
