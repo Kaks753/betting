@@ -76,21 +76,28 @@ logger = logging.getLogger("daily_card")
 # Gate helpers — BTTS and Forebet off until G1 50 CLV>0.3% (sequential Gates)
 _GATE_CACHE = {}
 def _is_g1_passed() -> bool:
-    """Check if G1 50 bets CLV>0.3% passed — cached."""
+    """Check if G1 50 bets CLV>0.3% in last 90d — cached, no fallback (honest)."""
     if "g1" in _GATE_CACHE:
         return _GATE_CACHE["g1"]
     try:
         from kbet.db import Database
         db = Database()
         db.migrate()
-        # Use get_performance fallback all-time (covers free ephemeral)
-        perf = db.get_performance(days=365)
-        n = perf.get("n_bets", 0) or perf.get("n_settled", 0) or 0
-        clv = perf.get("avg_clv")
-        passed = n >= 50 and clv is not None and clv > 0.003
+        conn = db.connect()
+        row = conn.execute("""
+            SELECT COUNT(*) as n, AVG(clv) as avg_clv
+            FROM bets
+            WHERE result IS NOT NULL AND clv IS NOT NULL
+              AND match_date >= date('now', '-90 days')
+        """).fetchone()
+        n = row["n"] or 0
+        avg_clv = row["avg_clv"]
+        passed = n >= 50 and avg_clv is not None and avg_clv > 0.003
         _GATE_CACHE["g1"] = passed
+        logger.info(f"[GATE G1] n={n} avg_clv={avg_clv} passed={passed}")
         return passed
-    except Exception:
+    except Exception as e:
+        logger.warning(f"[GATE G1] check failed: {e}")
         _GATE_CACHE["g1"] = False
         return False
 def _is_g2_passed() -> bool:
@@ -649,30 +656,19 @@ class DailyCardEngine:
             for side, (odds, pick) in odds_map.items():
                 blend_p = blended[side]
                 pin_p   = pin_probs[side]
+                dc_cal_p = dc_pred[side]  # raw calibrated DC for gap (not blend)
                 # xG form adjustment (if available) — boosts recency for Chelsea-like overhaul
                 try:
                     hx = get_rolling_xg(match.home_team, self.target_date, 10)
                     ax = get_rolling_xg(match.away_team, self.target_date, 10)
                     if hx and ax and side == "home" and hx["xg_for_avg"] > 1.8 and hx["xg_for_avg"] > ax["xg_against_avg"]:
                         blend_p = min(0.92, blend_p + 0.02)
+                        dc_cal_p = min(0.92, dc_cal_p + 0.02)
                     if hx and ax and side == "away" and ax["xg_for_avg"] > 1.8 and ax["xg_for_avg"] > hx["xg_against_avg"]:
                         blend_p = min(0.92, blend_p + 0.02)
+                        dc_cal_p = min(0.92, dc_cal_p + 0.02)
                 except Exception:
                     pass
-                # Forebet contrarian divergence — gated G3 (off until BTTS CLV), env KBET_FOREBET=1
-                if os.environ.get("KBET_FOREBET") == "1" and _is_g2_passed():
-                    try:
-                        fb = get_forebet_consensus(match.home_team, match.away_team, self.target_date)
-                        if fb:
-                            fb_p = fb.get({"home": "h", "draw": "d", "away": "a"}[side])
-                            if fb_p is not None:
-                                sig = divergence_signal(blend_p, fb_p)
-                                if sig == "MARKET_KNOWS_SOMETHING" and pin_gap < 0.02:
-                                    # Market disagrees strongly and gap small -> skip
-                                    continue
-                                # MODEL_FINDS_VALUE handled via pin_gap already
-                    except Exception:
-                        pass
 
                 # Sanity: odds plausible
                 if odds is None or odds <= 1.01 or odds > 20.0:
@@ -686,17 +682,30 @@ class DailyCardEngine:
 
                 slip = CARD_CONFIG["slippage"]
                 ev = ((blend_p * odds) - 1.0) * (1 - slip)
-                # EV ceiling 20% hard, 12% soft warn
+                # EV ceiling 20% hard, 12% soft warn — first filter
                 if ev > MAX_SANE_EV:
                     logger.warning(f"[EV REJECT] {match.home_team} v {match.away_team} {pick}: EV={ev:.1%} >20% ceiling")
                     continue
                 if ev > WARN_EV:
                     logger.info(f"[EV WARN] {match.home_team} v {match.away_team} {pick}: EV={ev:.1%} verify")
 
-                # Must genuinely exceed Pinnacle
-                pin_gap = blend_p - pin_p
-                if pin_gap < CARD_CONFIG["1x2_vs_pin_gap"]:
+                # Must genuinely exceed Pinnacle — use RAW DC gap (not blend) — 5x less strict
+                dc_gap = dc_cal_p - pin_p
+                pin_gap = dc_gap  # for confidence/clv downstream
+                if dc_gap < CARD_CONFIG["1x2_vs_pin_gap"]:
                     continue
+                # Forebet contrarian divergence — gated G3 (off until BTTS CLV), env KBET_FOREBET=1
+                if os.environ.get("KBET_FOREBET") == "1" and _is_g2_passed():
+                    try:
+                        fb = get_forebet_consensus(match.home_team, match.away_team, self.target_date)
+                        if fb:
+                            fb_p = fb.get({"home": "h", "draw": "d", "away": "a"}[side])
+                            if fb_p is not None:
+                                sig = divergence_signal(blend_p, fb_p)
+                                if sig == "MARKET_KNOWS_SOMETHING" and dc_gap < 0.02:
+                                    continue
+                    except Exception:
+                        pass
                 if blend_p < CARD_CONFIG["1x2_min_prob"]:
                     continue
                 if odds < CARD_CONFIG["min_odds"] or odds > CARD_CONFIG["max_odds"]:
@@ -797,9 +806,7 @@ class DailyCardEngine:
                 candidates = [(2.5, adj_over, best_ou.over, "over"), (2.5, adj_under, best_ou.under, "under")]
 
             for line, prob, odds, side in candidates:
-                # For non-2.5, use line-specific thresh
-                thr = CARD_CONFIG.get(f"ou{int(line*10)}_ev_thresh".replace("15","15").replace("25","").replace("35","35"), CARD_CONFIG["ou_ev_thresh"]) if line!=2.5 else CARD_CONFIG["ou_ev_thresh"]
-                # Actually map: 1.5->ou15, 2.5->ou, 3.5->ou35
+                # Line-specific thresholds (1.5/2.5/3.5)
                 if line == 1.5:
                     thr = CARD_CONFIG.get("ou15_ev_thresh", CARD_CONFIG["ou_ev_thresh"])
                     min_p = CARD_CONFIG.get("ou15_min_prob", CARD_CONFIG["ou_min_prob"])
@@ -821,12 +828,10 @@ class DailyCardEngine:
                         prob = min(0.92, prob + 0.02)
                 except Exception:
                     pass
-                if prob < CARD_CONFIG["ou_min_prob"]:
-                    continue
                 if odds < CARD_CONFIG["min_odds"] or odds > CARD_CONFIG["max_odds"]:
                     continue
                 ev = ((prob * odds) - 1.0) * (1 - CARD_CONFIG["slippage"])
-                if ev < CARD_CONFIG["ou_ev_thresh"]:
+                if ev < thr:
                     continue
                 if ev > 0.20:
                     logger.warning(f"[EV REJECT] O/U {match.home_team} v {match.away_team} {side}: EV={ev:.1%} >20%")
@@ -930,24 +935,8 @@ class DailyCardEngine:
         self, models: ModelSet, match: MatchOdds,
         home_id, away_id, weather_tag, weather
     ) -> List[Bet]:
-        """Asian Handicap -0.5/0:1 etc — uses DC Asian Handicap."""
-        bets = []
-        try:
-            for hcap in [-0.5, 0.0, 0.5]:
-                ah = models.dc.predict_asian_handicap(home_id, away_id, handicap=hcap)
-                if ah is None:
-                    continue
-                # Need odds for AH — try to get from totals? For now use h2h as proxy if no AH odds
-                # Historical parquet has no AH odds, so will be skipped until live AH market available
-                # Use best_h2h as fallback for testing: if hcap 0, prob ~ home win
-                prob = ah["home_cover"]
-                # Find AH odds — not yet in MatchOdds, so skip unless we have it
-                # For now, only evaluate if we have AH odds via best_totals as dummy
-                # This will be enabled when ODDS_API AH market is wired
-                continue
-        except Exception as e:
-            logger.warning(f"AH eval failed: {e}")
-        return bets
+        """Asian Handicap — stub removed (no AH odds data). See backlog for future wiring with ODDS_API AH market."""
+        return []
 
     def _eval_corners(
         self, models: ModelSet, match: MatchOdds,
@@ -1413,24 +1402,27 @@ def save_card(bets: List[Bet], target_date: str) -> Path:
         for item in data[cat]:
             item.pop("_score", None)
 
-    with open(out_path, "w") as f:
-        json.dump(data, f, indent=2, default=str)
-
-    # Trust ledger: SHA256 of actionable bets (proves no cherry-pick)
+    # Trust ledger: SHA256 first, then single write
     try:
         import hashlib
         ledger_dir = OUTPUT_DIR.parent / "public_picks"
         ledger_dir.mkdir(parents=True, exist_ok=True)
         hash_payload = json.dumps(actionable, sort_keys=True, default=str)
         h = hashlib.sha256(hash_payload.encode()).hexdigest()
+        data["ledger_hash"] = h
         with open(ledger_dir / f"hash_{target_date.replace('-','')}.txt", "w") as hf:
             hf.write(f"{h}  {target_date}  {len(actionable)} bets\n")
-        # Also store hash in card JSON for API
-        data["ledger_hash"] = h
-        with open(out_path, "w") as f:
-            json.dump(data, f, indent=2, default=str)
+        # Mirror to static ledger
+        static_ledger = Path(__file__).parent / "data" / "public_picks"
+        static_ledger.mkdir(exist_ok=True)
+        with open(static_ledger / f"hash_{target_date.replace('-','')}.txt", "w") as hf:
+            hf.write(f"{h}  {target_date}  {len(actionable)} bets\n")
     except Exception:
         pass
+
+    # Single write to out_path
+    with open(out_path, "w") as f:
+        json.dump(data, f, indent=2, default=str)
 
     # Also save to static repo path so it survives container restarts (fallback)
     static_dir = Path(__file__).parent / "data" / "daily_cards"

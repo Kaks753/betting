@@ -95,6 +95,23 @@ def _auto_generate_card():
     import time
     time.sleep(5)  # Let the server start fully first
 
+    # File lock to prevent duplicate concurrent generation on Render free wake-ups
+    try:
+        import fcntl
+        lock_path = Path("/tmp/kbet_card_gen.lock")
+        lock_path.parent.mkdir(exist_ok=True)
+        lock_file = open(lock_path, "w")
+        try:
+            fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            log.info("[STARTUP] Another card-gen is already running — skipping")
+            return
+    except ImportError:
+        # Windows fallback — no fcntl, use simple existence check
+        pass
+    except Exception:
+        pass
+
     today = date.today().strftime("%Y-%m-%d")
     try:
         db = Database()

@@ -142,6 +142,25 @@ def generate_card(
     return card
 
 
+def _to_tier(conf) -> str:
+    """Convert float confidence 0-1 or string tier to DB tier FIRE/SOLID/WATCH."""
+    if isinstance(conf, str):
+        c = conf.upper()
+        if c in ("FIRE", "SOLID", "WATCH"):
+            return c
+        # Try parse float string
+        try:
+            conf = float(conf)
+        except Exception:
+            return "WATCH"
+    if isinstance(conf, (int, float)):
+        if conf >= 0.80:
+            return "FIRE"
+        if conf >= 0.45:
+            return "SOLID"
+        return "WATCH"
+    return "WATCH"
+
 # ── Step 2: Persist card to DB ────────────────────────────────────────────────
 
 def persist_card(
@@ -204,7 +223,7 @@ def persist_card(
                 stake_pct=stake_pct,
                 stake_units=stake_units,
                 ev=float(bet.get("ev") or 0),
-                confidence=str(bet.get("confidence") or "WATCH"),
+                confidence=str(_to_tier(bet.get("confidence"))),
                 entry_prob=float(bet.get("entry_prob") or bet.get("model_prob") or 0),
             )
             n_saved += 1
@@ -268,21 +287,40 @@ def _settle_from_parquet(db: Database, before_date: str) -> Dict:
             (df["away_team"].str.strip().str.lower() == away)
         ]
         if matches.empty:
-            # Loose fallback: first 6 chars prefix (handles "Man City" vs "Manchester City")
+            # Robust fuzzy fallback: entity resolver + difflib
             import re
+            from difflib import SequenceMatcher
             def norm(s): return re.sub(r"[^a-z0-9]", "", s.lower())
-            nh, na = norm(home), norm(away)
-            mask = (df["date_str"] == match_date)
-            # Filter by substring match
-            candidates = df[mask]
-            for _, cand in candidates.iterrows():
-                ch = norm(str(cand["home_team"]))
-                ca = norm(str(cand["away_team"]))
-                if (nh[:6] in ch or ch[:6] in nh) and (na[:6] in ca or ca[:6] in na):
-                    matches = candidates[(candidates["home_team"].str.lower().str.contains(home[:4], na=False))].head(1)
-                    # Use the single candidate
-                    matches = pd.DataFrame([cand])
-                    break
+            def is_same(a: str, b: str, thr: float = 0.85) -> bool:
+                if not a or not b:
+                    return False
+                na, nb = norm(a), norm(b)
+                if na == nb:
+                    return True
+                return SequenceMatcher(None, na, nb).ratio() >= thr
+            # Try entity resolver first (handles Man City vs Manchester City)
+            try:
+                from kbet.engine.utils.entity_resolver import EntityRegistry
+                reg = EntityRegistry()
+                home_norm = reg.resolve(bet["home_team"])
+                away_norm = reg.resolve(bet["away_team"])
+                # Resolver returns canonical, try exact with canonical
+                alt = df[
+                    (df["date_str"] == match_date) &
+                    (df["home_team"].str.strip().str.lower() == home_norm.strip().lower()) &
+                    (df["away_team"].str.strip().str.lower() == away_norm.strip().lower())
+                ]
+                if not alt.empty:
+                    matches = alt
+                else:
+                    raise ValueError("no resolver match")
+            except Exception:
+                # Fallback difflib
+                candidates = df[df["date_str"] == match_date]
+                for _, cand in candidates.iterrows():
+                    if is_same(bet["home_team"], str(cand["home_team"])) and is_same(bet["away_team"], str(cand["away_team"])):
+                        matches = pd.DataFrame([cand])
+                        break
 
         if matches.empty:
             log.debug(f"  No match: {bet['home_team']} v {bet['away_team']} {match_date}")
